@@ -1,0 +1,12 @@
+{
+  "name": "Eldritch Arena",
+  "short_name": "Eldritch",
+  "description": "Hub definitivo dos duelos de TCG no Brasil.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#05030A",
+  "theme_color": "#7C3AED",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
+  ]
+}
