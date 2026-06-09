@@ -1,7 +1,7 @@
 <x-layouts.app title="Eldritch Arena — TCG Hub Brasil">
     <section class="grid min-h-[82vh] items-center gap-10 py-10 lg:grid-cols-[1.05fr_.95fr]">
         <div>
-            <div class="mb-6 inline-flex rounded-full border border-arena-purple/40 bg-arena-purple/10 px-4 py-2 text-sm font-bold text-purple-100 shadow-neon">Protótipo funcional para TCC • Laravel + Tailwind + Alpine</div>
+            <div class="mb-6 inline-flex rounded-full border border-arena-purple/40 bg-arena-purple/10 px-4 py-2 text-sm font-bold text-purple-100 shadow-neon">Sua Plataforma De TCG</div>
             <h1 class="font-display text-5xl font-black leading-tight tracking-tight md:text-7xl">
                 <span class="arena-glow-text">Eldritch Arena</span>
             </h1>
