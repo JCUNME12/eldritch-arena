@@ -13,6 +13,9 @@
                 <a href="{{ route('dashboard') }}" class="arena-btn-secondary">Dashboard</a>
                 <a href="{{ route('tournaments.index') }}" class="arena-btn-secondary">Torneios</a>
                 <a href="{{ route('marketplace') }}" class="arena-btn-secondary">Marketplace</a>
+                <a href="{{ route('marketplace.create') }}" class="arena-btn-secondary">Vender Carta</a>
+                <a href="{{ route('community') }}" class="arena-btn-secondary">Comunidade</a>
+                <a href="{{ route('premium') }}" class="arena-btn-secondary">Premium</a>
                 <a href="{{ route('life-counter') }}" class="arena-btn">Contador</a>
                 <form method="POST" action="{{ route('logout') }}">@csrf<button class="arena-btn-secondary">Sair</button></form>
             @else

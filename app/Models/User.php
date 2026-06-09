@@ -17,6 +17,9 @@ class User extends Authenticatable
         'password',
         'type',
         'avatar_color',
+        'premium_plan',
+        'premium_active',
+        'premium_started_at',
     ];
 
     protected $hidden = [
@@ -29,6 +32,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'premium_active' => 'boolean',
+            'premium_started_at' => 'datetime',
         ];
     }
 
@@ -42,6 +47,21 @@ class User extends Authenticatable
         return $this->hasMany(TournamentRegistration::class);
     }
 
+    public function cardListings(): HasMany
+    {
+        return $this->hasMany(CardListing::class);
+    }
+
+    public function communityTopics(): HasMany
+    {
+        return $this->hasMany(CommunityTopic::class);
+    }
+
+    public function communityComments(): HasMany
+    {
+        return $this->hasMany(CommunityComment::class);
+    }
+
     public function isPlayer(): bool
     {
         return $this->type === 'player';
@@ -50,5 +70,10 @@ class User extends Authenticatable
     public function isOrganizer(): bool
     {
         return $this->type === 'organizer';
+    }
+
+    public function isPremium(): bool
+    {
+        return (bool) $this->premium_active;
     }
 }
