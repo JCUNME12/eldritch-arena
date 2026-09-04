@@ -92,7 +92,18 @@ jobs:
         run: vendor/bin/pint --test
 
       - name: Audit PHP dependencies
-        run: composer audit
+        run: |
+          for attempt in 1 2 3; do
+            if composer audit --locked; then
+              exit 0
+            fi
+
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 10))
+            fi
+          done
+
+          exit 1
 
   container:
     runs-on: ubuntu-latest
