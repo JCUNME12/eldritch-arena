@@ -24,11 +24,15 @@
                 <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Perfil de jogador com destaque na comunidade.</p>
             </div>
 
-            <form method="POST" action="{{ route('premium.subscribe') }}" class="mt-6">
-                @csrf
-                <input type="hidden" name="plan" value="player_premium">
-                <button class="arena-btn w-full">Assinar Player Premium</button>
-            </form>
+            @if (config('features.demo_premium_subscription'))
+                <form method="POST" action="{{ route('premium.subscribe') }}" class="mt-6">
+                    @csrf
+                    <input type="hidden" name="plan" value="player_premium">
+                    <button class="arena-btn w-full">Ativar demonstração Player Premium</button>
+                </form>
+            @else
+                <p class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-sm text-slate-400">Assinaturas ainda não estão disponíveis.</p>
+            @endif
         </section>
 
         <section class="arena-card border-arena-gold/30 p-6">
@@ -43,16 +47,20 @@
                 <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Maior capacidade de divulgação de produtos e torneios.</p>
             </div>
 
-            <form method="POST" action="{{ route('premium.subscribe') }}" class="mt-6">
-                @csrf
-                <input type="hidden" name="plan" value="loja_premium">
-                <button class="arena-btn w-full">Assinar Loja Premium</button>
-            </form>
+            @if (config('features.demo_premium_subscription'))
+                <form method="POST" action="{{ route('premium.subscribe') }}" class="mt-6">
+                    @csrf
+                    <input type="hidden" name="plan" value="loja_premium">
+                    <button class="arena-btn w-full">Ativar demonstração Loja Premium</button>
+                </form>
+            @else
+                <p class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-sm text-slate-400">Assinaturas ainda não estão disponíveis.</p>
+            @endif
         </section>
     </div>
 
     <section class="arena-card mt-6 p-6">
         <h2 class="text-2xl font-black text-white">Observação para a banca</h2>
-        <p class="mt-3 text-slate-400">O botão de assinatura não realiza cobrança real. Ele apenas ativa o estado premium do usuário no banco de dados para demonstrar o modelo de monetização, a diferenciação entre planos e o impacto visual no marketplace.</p>
+        <p class="mt-3 text-slate-400">No ambiente de demonstração, os botões não realizam cobrança real: apenas ativam o estado premium no banco. Em produção, a ativação fica bloqueada até que um provedor de pagamentos seja integrado.</p>
     </section>
 </x-layouts.app>

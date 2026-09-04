@@ -1,4 +1,5 @@
 {
+  "name": "eldritch-arena",
   "private": true,
   "type": "module",
   "scripts": {

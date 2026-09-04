@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+    image: eldritch-arena:latest
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      APP_NAME: "Eldritch Arena"
+      APP_ENV: production
+      APP_KEY: "${APP_KEY:?APP_KEY e obrigatoria}"
+      APP_DEBUG: "false"
+      APP_TIMEZONE: America/Sao_Paulo
+      APP_URL: "${APP_URL:?APP_URL e obrigatoria}"
+      APP_LOCALE: pt_BR
+      APP_FALLBACK_LOCALE: pt_BR
+      DB_CONNECTION: pgsql
+      DB_HOST: "${DB_HOST:?DB_HOST do RDS e obrigatorio}"
+      DB_PORT: "${DB_PORT:-5432}"
+      DB_DATABASE: "${DB_DATABASE:-eldritch_arena}"
+      DB_USERNAME: "${DB_USERNAME:?DB_USERNAME e obrigatorio}"
+      DB_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD e obrigatoria}"
+      DB_SSLMODE: "${DB_SSLMODE:-require}"
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: warning
+      DEMO_PREMIUM_SUBSCRIPTION: "false"
+      RUN_MIGRATIONS: "true"
+    volumes:
+      - eldritch_storage:/var/www/html/storage/app/public
+
+volumes:
+  eldritch_storage:
+    name: eldritch_storage

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Tournament;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class TournamentController extends Controller
@@ -12,13 +14,18 @@ class TournamentController extends Controller
     public function index(): View
     {
         return view('tournaments.index', [
-            'tournaments' => Tournament::with(['organizer', 'registrations'])->withCount('registrations')->orderBy('starts_at')->get(),
+            'tournaments' => Tournament::with(['organizer', 'registrations'])
+                ->withCount('registrations')
+                ->where('status', Tournament::STATUS_PUBLISHED)
+                ->orderBy('starts_at')
+                ->get(),
         ]);
     }
 
     public function show(Tournament $tournament): View
     {
         $tournament->load(['organizer', 'registrations'])->loadCount('registrations');
+
         return view('tournaments.show', compact('tournament'));
     }
 
@@ -32,7 +39,7 @@ class TournamentController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'game' => ['required', 'string', 'max:80'],
-            'starts_at' => ['required', 'date'],
+            'starts_at' => ['required', 'date', 'after:now'],
             'prize' => ['required', 'string', 'max:255'],
             'entry_fee' => ['required', 'numeric', 'min:0'],
             'slots' => ['required', 'integer', 'min:2', 'max:256'],
@@ -41,7 +48,8 @@ class TournamentController extends Controller
         ]);
 
         $data['organizer_id'] = $request->user()->id;
-        $data['highlighted'] = true;
+        $data['highlighted'] = $request->user()->isPremium();
+        $data['status'] = Tournament::STATUS_PUBLISHED;
 
         $tournament = Tournament::create($data);
 
@@ -50,10 +58,36 @@ class TournamentController extends Controller
 
     public function register(Request $request, Tournament $tournament): RedirectResponse
     {
-        $tournament->registrations()->firstOrCreate([
-            'user_id' => $request->user()->id,
-        ], ['status' => 'confirmed']);
+        $message = DB::transaction(function () use ($request, $tournament): string {
+            $lockedTournament = Tournament::query()
+                ->whereKey($tournament->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        return back()->with('status', 'Inscrição confirmada. Prepare seu deck.');
+            if ($lockedTournament->registrations()->where('user_id', $request->user()->id)->exists()) {
+                return 'Você já está inscrito neste torneio.';
+            }
+
+            if (! $lockedTournament->isOpenForRegistration()) {
+                throw ValidationException::withMessages([
+                    'tournament' => 'As inscrições para este torneio estão encerradas.',
+                ]);
+            }
+
+            if ($lockedTournament->registrations()->count() >= $lockedTournament->slots) {
+                throw ValidationException::withMessages([
+                    'tournament' => 'Este torneio atingiu o limite de participantes.',
+                ]);
+            }
+
+            $lockedTournament->registrations()->create([
+                'user_id' => $request->user()->id,
+                'status' => 'confirmed',
+            ]);
+
+            return 'Inscrição confirmada. Prepare seu deck.';
+        }, attempts: 3);
+
+        return back()->with('status', $message);
     }
 }

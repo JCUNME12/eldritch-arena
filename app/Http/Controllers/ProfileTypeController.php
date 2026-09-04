@@ -11,6 +11,7 @@ class ProfileTypeController extends Controller
     {
         $request->validate(['type' => ['required', 'in:player,organizer']]);
         $request->user()->update(['type' => $request->type]);
+
         return redirect()->route('dashboard')->with('status', 'Perfil alterado com sucesso.');
     }
 }

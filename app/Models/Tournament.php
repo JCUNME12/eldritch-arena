@@ -11,6 +11,12 @@ class Tournament extends Model
 {
     use HasFactory;
 
+    public const STATUS_PUBLISHED = 'published';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    public const STATUS_FINISHED = 'finished';
+
     protected $fillable = [
         'organizer_id',
         'title',
@@ -22,6 +28,7 @@ class Tournament extends Model
         'location',
         'description',
         'highlighted',
+        'status',
     ];
 
     protected function casts(): array
@@ -50,5 +57,10 @@ class Tournament extends Model
         }
 
         return $this->registrations()->where('user_id', $user->id)->exists();
+    }
+
+    public function isOpenForRegistration(): bool
+    {
+        return $this->status === self::STATUS_PUBLISHED && $this->starts_at->isFuture();
     }
 }

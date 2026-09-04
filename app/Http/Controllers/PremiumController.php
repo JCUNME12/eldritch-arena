@@ -16,6 +16,8 @@ class PremiumController extends Controller
 
     public function subscribe(Request $request): RedirectResponse
     {
+        abort_unless(config('features.demo_premium_subscription'), 404);
+
         $validated = $request->validate([
             'plan' => ['required', 'in:player_premium,loja_premium'],
         ]);

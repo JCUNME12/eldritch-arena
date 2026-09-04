@@ -6,10 +6,17 @@ use App\Models\CardListing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class MarketplaceController extends Controller
 {
+    private const GAMES = ['Magic', 'Pokémon', 'Yu-Gi-Oh'];
+
+    private const CONDITIONS = ['Novo', 'Excelente', 'Bom', 'Usado', 'Danificado'];
+
+    private const RARITIES = ['Comum', 'Incomum', 'Rara', 'Mítica', 'Ultra Rara', 'Secreta'];
+
     public function index(Request $request): View
     {
         $game = $request->query('game');
@@ -23,16 +30,16 @@ class MarketplaceController extends Controller
         return view('marketplace.index', [
             'cards' => $cards,
             'selectedGame' => $game,
-            'games' => ['Magic', 'Pokémon', 'Yu-Gi-Oh'],
+            'games' => self::GAMES,
         ]);
     }
 
     public function create(): View
     {
         return view('marketplace.create', [
-            'games' => ['Magic', 'Pokémon', 'Yu-Gi-Oh'],
-            'conditions' => ['Novo', 'Excelente', 'Bom', 'Usado', 'Danificado'],
-            'rarities' => ['Comum', 'Incomum', 'Rara', 'Mítica', 'Ultra Rara', 'Secreta'],
+            'games' => self::GAMES,
+            'conditions' => self::CONDITIONS,
+            'rarities' => self::RARITIES,
         ]);
     }
 
@@ -40,10 +47,10 @@ class MarketplaceController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'game' => ['required', 'string', 'max:40'],
+            'game' => ['required', 'string', Rule::in(self::GAMES)],
             'edition' => ['nullable', 'string', 'max:120'],
-            'rarity' => ['required', 'string', 'max:60'],
-            'condition' => ['required', 'string', 'max:60'],
+            'rarity' => ['required', 'string', Rule::in(self::RARITIES)],
+            'condition' => ['required', 'string', Rule::in(self::CONDITIONS)],
             'description' => ['nullable', 'string', 'max:1000'],
             'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'image_url' => ['nullable', 'url', 'max:500'],

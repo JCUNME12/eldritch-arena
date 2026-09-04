@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
             Tournament::updateOrCreate(['title' => $data['title']], array_merge($data, [
                 'organizer_id' => $organizer->id,
                 'description' => 'Evento competitivo com pareamento presencial, ambiente seguro e premiações pensadas para jogadores de TCG.',
+                'status' => Tournament::STATUS_PUBLISHED,
             ]));
         }
 

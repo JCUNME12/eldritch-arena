@@ -1,132 +1,144 @@
 # Documentação Técnica — Eldritch Arena
 
-O **Eldritch Arena** é uma aplicação web construída em Laravel para demonstrar a primeira etapa de um sistema voltado à organização de torneios e apoio a comunidades de card games. A arquitetura segue o padrão **MVC**, separando regras de controle, persistência de dados e apresentação em camadas distintas, conforme a estrutura convencional do Laravel.[1]
+## 1. Visão geral
 
----
+O Eldritch Arena usa a arquitetura MVC do Laravel. As requisições HTTP passam pelas rotas e pelos middlewares, são tratadas pelos controllers, persistidas pelos models Eloquent no PostgreSQL e renderizadas em views Blade.
 
-## 1. Visão Geral da Arquitetura
-
-A aplicação utiliza controllers para coordenar requisições, models para representar as entidades principais e views Blade para renderizar as páginas. O fluxo foi construído com foco em um protótipo acadêmico demonstrável, priorizando clareza, organização e possibilidade de evolução.
-
-| Camada | Responsabilidade | Arquivos principais |
+| Camada | Responsabilidade | Local principal |
 |---|---|---|
-| Rotas | Definir URLs públicas e protegidas | `routes/web.php` |
-| Controllers | Processar requisições e regras de navegação | `app/Http/Controllers` |
-| Models | Representar entidades do banco | `app/Models` |
-| Views | Renderizar a interface | `resources/views` |
-| Banco | Criar tabelas e dados iniciais | `database/migrations`, `database/seeders` |
-| Assets | Organizar CSS, JavaScript e build | `resources/css`, `resources/js`, `public/build` |
+| Rotas | Endpoints, autenticação, autorização e limites de uso | `routes/web.php` |
+| Controllers | Validação e regras dos casos de uso | `app/Http/Controllers` |
+| Models | Entidades, relacionamentos e conversões de tipos | `app/Models` |
+| Banco | Estrutura, restrições, índices e dados demonstrativos | `database` |
+| Interface | Telas Blade e assets Vite | `resources` |
+| Infraestrutura | Imagem e orquestração dos serviços | `Dockerfile`, arquivos Compose |
 
----
+## 2. Arquitetura de produção
 
-## 2. Módulos Implementados
+O desenho recomendado na AWS é composto por:
 
-### 2.1 Autenticação
+1. Navegador acessando a aplicação na EC2.
+2. Contêiner Apache/PHP executando Laravel 13.
+3. Volume persistente para imagens enviadas.
+4. Amazon RDS for PostgreSQL acessível somente a partir da EC2.
+5. GitHub Actions validando alterações antes da publicação.
 
-A autenticação contempla cadastro, login e logout. As rotas internas estão protegidas por middleware de autenticação, garantindo que apenas usuários logados acessem dashboard, torneios, marketplace e contador de vida.
+O banco não deve receber endereço público nem liberar `5432` para `0.0.0.0/0`. O grupo de segurança do RDS deve referenciar o grupo da EC2 como origem.
 
-### 2.2 Perfis de Usuário
+## 3. Banco de dados
 
-O campo de tipo de usuário permite diferenciar **jogadores** e **organizadores**. Essa separação sustenta dashboards diferentes e permite futuras regras de permissão mais avançadas.
+PostgreSQL substitui o SQLite usado no protótipo. A mudança melhora concorrência, integridade, backup e operação em múltiplos processos.
 
-### 2.3 Torneios
-
-O módulo de torneios oferece listagem, criação, detalhes e inscrição. Ele representa a funcionalidade central do sistema, pois conecta usuários, eventos e participação comunitária.
-
-### 2.4 Marketplace Demonstrativo
-
-O marketplace foi incluído como módulo conceitual para demonstrar potencial comercial e comunitário da plataforma. Nesta versão, ele funciona como vitrine demonstrativa.
-
-### 2.5 Contador de Vida
-
-O contador de vida oferece uma ferramenta rápida para uso durante partidas. Ele reforça o caráter prático da aplicação e aproxima o sistema da realidade dos jogadores.
-
-### 2.6 PWA Inicial
-
-O projeto inclui manifesto e service worker básico. Esse recurso prepara o caminho para instalação futura em dispositivos móveis e melhoria progressiva da experiência.[4]
-
----
-
-## 3. Entidades do Banco de Dados
-
-| Entidade | Campos principais | Finalidade |
-|---|---|---|
-| `users` | `name`, `email`, `password`, `type` | Gerenciar usuários e perfis |
-| `tournaments` | `name`, `description`, `starts_at`, `status`, `created_by` | Armazenar eventos competitivos |
-| `tournament_registrations` | `user_id`, `tournament_id` | Registrar inscrições |
-| `card_listings` | `name`, `rarity`, `price`, `condition` | Exibir cartas no marketplace |
-
----
-
-## 4. Rotas e Fluxo de Navegação
-
-O fluxo básico começa na página inicial, passa por cadastro ou login, direciona o usuário para o dashboard e libera acesso aos módulos internos. As rotas protegidas foram agrupadas por middleware `auth`.
-
-| Etapa | Rota | Resultado esperado |
-|---|---|---|
-| Entrada | `/` | Apresentação do sistema |
-| Cadastro | `/cadastro` | Criação de conta |
-| Login | `/login` | Autenticação |
-| Painel | `/dashboard` | Área interna personalizada |
-| Torneios | `/torneios` | Listagem e participação |
-| Marketplace | `/marketplace` | Vitrine demonstrativa |
-| Contador | `/contador-de-vida` | Ferramenta auxiliar |
-
----
-
-## 5. Frontend e Identidade Visual
-
-A interface foi construída com Blade e Tailwind CSS. O uso de Tailwind facilita a criação de layouts responsivos por classes utilitárias, mantendo consistência visual e velocidade de desenvolvimento.[2]
-
-| Decisão visual | Justificativa |
+| Entidade | Responsabilidade |
 |---|---|
-| Tema escuro | Aproximação estética com o público gamer |
-| Cards destacados | Organização de informações em blocos legíveis |
-| Gradientes | Criação de identidade tecnológica |
-| Navegação responsiva | Uso adequado em computadores e celulares |
-| Componentes Blade | Reutilização de cabeçalho, layout e navegação |
+| `users` | Contas, perfis e estado premium |
+| `tournaments` | Eventos publicados, cancelados ou finalizados |
+| `tournament_registrations` | Participações únicas de usuários em torneios |
+| `card_listings` | Anúncios do marketplace |
+| `community_topics` | Tópicos e categorias da comunidade |
+| `community_comments` | Comentários associados aos tópicos |
+| `community_reactions` | Reações únicas por usuário, tópico e tipo |
+| `sessions`, `cache`, `jobs` | Estado operacional do Laravel |
 
----
+As chaves estrangeiras usam exclusão em cascata quando o registro filho não faz sentido sem o pai. Inscrições e reações possuem restrições únicas no banco, além das validações da aplicação.
 
-## 6. Build e Execução
+### 3.1 Concorrência em inscrições
 
-O frontend utiliza Vite para compilação de assets. O Vite é uma ferramenta moderna de build voltada a desenvolvimento rápido e empacotamento otimizado.[3]
+A inscrição em torneio ocorre em uma transação. O torneio é bloqueado durante a verificação de duplicidade, status, data e quantidade de vagas. Isso impede que duas requisições ocupem a última vaga ao mesmo tempo.
 
-```bash
-composer install
-npm install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-npm run build
-php artisan serve
-```
+### 3.2 Migração do SQLite
 
----
+O comando `eldritch:import-sqlite`:
 
-## 7. Validações Realizadas
+- exige que as migrations já existam no destino;
+- preserva IDs e chaves estrangeiras;
+- copia somente colunas presentes nos dois bancos;
+- importa tabelas na ordem de dependência;
+- ajusta sequências do PostgreSQL;
+- recusa um banco de destino preenchido sem `--replace`;
+- executa a importação dentro de uma transação.
 
-Durante a preparação do protótipo, foram realizadas verificações de sintaxe PHP nos controllers, models, migrations, seeders e rotas. Também foi confirmada a presença dos arquivos PWA básicos e dos assets compilados pelo Vite.
+Os arquivos em `storage/app/public` precisam de cópia separada.
 
-| Validação | Resultado |
-|---|---|
-| Sintaxe PHP | Sem erros detectados nos arquivos criados |
-| Estrutura MVC | Controllers, models e views organizados |
-| Assets frontend | Build do Vite gerado |
-| PWA básico | `manifest.json` e `service-worker.js` presentes |
-| Documentação | README e documentação técnica criados |
+## 4. Autenticação e autorização
 
----
+- Senhas usam o hash configurado pelo Laravel.
+- A sessão é regenerada após login e invalidada no logout.
+- Rotas internas exigem autenticação.
+- O middleware `organizer` restringe a criação de torneios.
+- Alterações e exclusões da comunidade verificam a propriedade do conteúdo.
+- Login e cadastro têm limites próprios; outras gravações usam o limite `writes`.
 
-## 8. Limitações da Primeira Versão
+## 5. Validação de entrada
 
-Esta primeira etapa foi planejada como protótipo acadêmico. Portanto, algumas funcionalidades permanecem como evolução futura, como pagamento de inscrições, ranking oficial, marketplace transacional, notificações em tempo real e painel administrativo completo.
+Controllers validam tamanho, tipo e domínio dos dados antes da persistência. Marketplace, categorias, reações e planos aceitam somente valores conhecidos. Uploads são limitados a imagens de até 4 MB nos formatos autorizados.
 
----
+O recurso de assinatura é apenas demonstrativo. Ele depende de `DEMO_PREMIUM_SUBSCRIPTION=true` e permanece forçado como falso no Compose de produção. Uma versão comercial deverá integrar um provedor de pagamentos e confirmar cobranças por webhook antes de liberar benefícios.
 
-## Referências
+## 6. Contêiner de produção
 
-[1]: https://laravel.com/docs/11.x "Laravel 11 Documentation"  
-[2]: https://tailwindcss.com/docs "Tailwind CSS Documentation"  
-[3]: https://vite.dev/guide/ "Vite Guide"  
-[4]: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps "MDN Web Docs — Progressive Web Apps"  
+O `Dockerfile` possui três estágios:
+
+1. Node.js compila CSS e JavaScript.
+2. Composer instala dependências PHP sem pacotes de desenvolvimento.
+3. PHP 8.4 com Apache recebe somente os artefatos necessários.
+
+A imagem instala `pdo_pgsql`, `intl`, `zip` e OPcache. O Apache serve apenas a pasta `public`. O health check consulta `/up`.
+
+O entrypoint prepara diretórios, cria o link de armazenamento, gera caches e tenta executar migrations antes de iniciar o Apache. Uma falha persistente de conexão encerra o contêiner em vez de publicar uma aplicação parcialmente inicializada.
+
+## 7. Persistência e backups
+
+Há dois tipos de dados persistentes:
+
+- PostgreSQL: snapshots e backups automatizados do RDS.
+- Uploads: volume `eldritch_storage`, que requer backup próprio.
+
+Uma restauração completa precisa dos dois. Segredos ficam em variáveis de ambiente e não fazem parte da imagem ou do repositório.
+
+## 8. Pipeline de integração contínua
+
+O workflow `.github/workflows/ci.yml` executa em `main`, branches `upgrade/**` e pull requests:
+
+1. Instala PHP 8.4, Node.js 22 e as dependências.
+2. Compila os assets.
+3. Cria e popula um PostgreSQL 17 temporário.
+4. Executa os testes.
+5. Verifica formatação e vulnerabilidades PHP conhecidas.
+6. Constrói a imagem Docker de produção.
+
+O segundo estágio só roda se todas as verificações anteriores passarem.
+
+## 9. Testes automatizados
+
+A suíte cobre:
+
+- disponibilidade das páginas públicas e do health check;
+- proteção do dashboard;
+- cadastro, login, logout e credenciais inválidas;
+- autorização de organizadores e criação de torneios;
+- inscrições duplicadas, lotação e cancelamento;
+- criação e autorização de conteúdo da comunidade;
+- validação do catálogo do marketplace;
+- bloqueio do premium demonstrativo em produção;
+- importação segura do SQLite legado.
+
+## 10. Decisões ainda pendentes
+
+Antes de uma abertura pública definitiva, recomenda-se implementar:
+
+- verificação de e-mail e recuperação de senha;
+- painel administrativo e moderação;
+- HTTPS com domínio;
+- serviço de e-mail transacional;
+- observabilidade e alertas;
+- política de privacidade e termos de uso;
+- integração real de pagamentos;
+- armazenamento de uploads em S3 caso a aplicação cresça horizontalmente.
+
+## 11. Referências
+
+- [Documentação do Laravel 13](https://laravel.com/docs/13.x)
+- [Documentação do PostgreSQL](https://www.postgresql.org/docs/)
+- [Documentação do Docker Compose](https://docs.docker.com/compose/)
+- [Amazon RDS for PostgreSQL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html)

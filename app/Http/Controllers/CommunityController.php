@@ -8,6 +8,7 @@ use App\Models\CommunityTopic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CommunityController extends Controller
@@ -47,7 +48,7 @@ class CommunityController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:140'],
-            'category' => ['required', 'string', 'max:40'],
+            'category' => ['required', 'string', Rule::in($this->categories)],
             'body' => ['required', 'string', 'min:20', 'max:5000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
         ], [
@@ -99,7 +100,7 @@ class CommunityController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:140'],
-            'category' => ['required', 'string', 'max:40'],
+            'category' => ['required', 'string', Rule::in($this->categories)],
             'body' => ['required', 'string', 'min:20', 'max:5000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
             'remove_image' => ['nullable', 'boolean'],
@@ -248,7 +249,7 @@ class CommunityController extends Controller
     public function react(Request $request, CommunityTopic $topic): RedirectResponse
     {
         $validated = $request->validate([
-            'type' => ['required', 'string', 'in:' . implode(',', array_keys($this->reactionTypes))],
+            'type' => ['required', 'string', 'in:'.implode(',', array_keys($this->reactionTypes))],
         ]);
 
         $reaction = CommunityReaction::where('community_topic_id', $topic->id)
