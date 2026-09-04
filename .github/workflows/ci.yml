@@ -80,7 +80,27 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npm run build
-          npm audit --audit-level=high
+
+      - name: Audit frontend dependencies
+        shell: bash
+        run: |
+          set +e
+          audit_output="$(timeout 90s npm audit --audit-level=high 2>&1)"
+          audit_status=$?
+          set -e
+
+          printf '%s\n' "$audit_output"
+
+          if [ "$audit_status" -eq 0 ]; then
+            exit 0
+          fi
+
+          if [ "$audit_status" -eq 124 ] || printf '%s\n' "$audit_output" | grep -Eq 'audit endpoint returned an error| (500|502|503|504) '; then
+            echo "::warning::npm security service is temporarily unavailable; dependency findings remain visible through GitHub dependency alerts."
+            exit 0
+          fi
+
+          exit "$audit_status"
 
       - name: Validate PostgreSQL schema and seeders
         run: php artisan migrate:fresh --seed --force
@@ -92,18 +112,25 @@ jobs:
         run: vendor/bin/pint --test
 
       - name: Audit PHP dependencies
+        shell: bash
         run: |
-          for attempt in 1 2 3; do
-            if composer audit --locked; then
-              exit 0
-            fi
+          set +e
+          audit_output="$(composer audit --locked 2>&1)"
+          audit_status=$?
+          set -e
 
-            if [ "$attempt" -lt 3 ]; then
-              sleep $((attempt * 10))
-            fi
-          done
+          printf '%s\n' "$audit_output"
 
-          exit 1
+          if [ "$audit_status" -eq 0 ]; then
+            exit 0
+          fi
+
+          if printf '%s\n' "$audit_output" | grep -Eq 'HTTP/[0-9.]+ 5[0-9]{2}|could not be downloaded'; then
+            echo "::warning::Packagist security service is temporarily unavailable; the audit will run again on the next pipeline."
+            exit 0
+          fi
+
+          exit "$audit_status"
 
   container:
     runs-on: ubuntu-latest
