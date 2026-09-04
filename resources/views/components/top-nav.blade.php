@@ -15,7 +15,10 @@
                 <a href="{{ route('marketplace') }}" class="arena-btn-secondary">Marketplace</a>
                 <a href="{{ route('marketplace.create') }}" class="arena-btn-secondary">Vender Carta</a>
                 <a href="{{ route('community') }}" class="arena-btn-secondary">Comunidade</a>
-                <a href="{{ route('premium') }}" class="arena-btn-secondary">Premium</a>
+                @if(auth()->user()->isAdmin())
+                    <a href="{{ route('admin.index') }}" class="arena-btn-secondary border-arena-gold/40 text-arena-gold">Admin</a>
+                @endif
+                <a href="{{ route('account.edit') }}" class="arena-btn-secondary">Conta</a>
                 <a href="{{ route('life-counter') }}" class="arena-btn">Contador</a>
                 <form method="POST" action="{{ route('logout') }}">@csrf<button class="arena-btn-secondary">Sair</button></form>
             @else

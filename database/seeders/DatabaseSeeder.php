@@ -87,10 +87,10 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $organizer->id,
                 'title' => 'Bem-vindos à comunidade Eldritch Arena',
                 'category' => 'Avisos',
-                'body' => 'Este espaço foi criado para centralizar conversas entre players, lojistas e organizadores. Use os tópicos para tirar dúvidas, divulgar eventos, discutir decks, combinar partidas, melhorar listas competitivas e demonstrar para a banca como a comunidade funciona dentro do sistema.',
+                'body' => 'Este espaço reúne jogadores, lojistas e organizadores. Use os tópicos para tirar dúvidas, divulgar eventos, discutir decks, combinar partidas e melhorar listas competitivas.',
                 'is_pinned' => true,
                 'comments' => [
-                    ['user_id' => $player->id, 'body' => 'Ficou muito bom ter uma área própria para conversar sobre torneios e marketplace. Ajuda a mostrar o lado social do projeto.'],
+                    ['user_id' => $player->id, 'body' => 'Muito bom ter uma área própria para conversar sobre torneios e marketplace. Vai ajudar bastante a comunidade local.'],
                 ],
                 'reactions' => [
                     ['user_id' => $player->id, 'type' => 'heart'],
@@ -114,7 +114,7 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $organizer->id,
                 'title' => 'Dicas para comprar cartas com segurança no marketplace',
                 'category' => 'Marketplace',
-                'body' => 'Confiram sempre o estado da carta, a reputação do vendedor, o contato informado e, quando possível, negociem em eventos ou lojas parceiras. Para o TCC, essa discussão demonstra como marketplace e comunidade se conectam dentro do Eldritch Arena.',
+                'body' => 'Confiram sempre o estado da carta, a reputação do vendedor e o contato informado. Quando possível, negociem em eventos ou lojas parceiras e solicitem fotos atuais antes de fechar a compra.',
                 'is_pinned' => false,
                 'comments' => [
                     ['user_id' => $player->id, 'body' => 'Boa dica. Também acho importante pedir foto da carta antes de fechar negócio.'],
@@ -149,9 +149,10 @@ class DatabaseSeeder extends Seeder
             );
 
             foreach ($comments as $commentData) {
-                CommunityComment::firstOrCreate([
+                CommunityComment::updateOrCreate([
                     'community_topic_id' => $topic->id,
                     'user_id' => $commentData['user_id'],
+                ], [
                     'body' => $commentData['body'],
                 ]);
             }

@@ -110,4 +110,43 @@ class TournamentTest extends TestCase
             ->post(route('tournaments.register', $tournament))
             ->assertSessionHasErrors('tournament');
     }
+
+    public function test_organizer_can_update_and_cancel_their_tournament(): void
+    {
+        $organizer = User::factory()->create(['type' => 'organizer']);
+        $tournament = Tournament::factory()->create(['organizer_id' => $organizer->id]);
+
+        $this->actingAs($organizer)->put(route('tournaments.update', $tournament), [
+            'title' => 'Open Eldritch Atualizado',
+            'game' => 'Pokémon',
+            'starts_at' => now()->addDays(10)->format('Y-m-d H:i:s'),
+            'prize' => 'Troféu e boosters',
+            'entry_fee' => 45,
+            'slots' => 24,
+            'location' => 'Arena Norte',
+            'description' => 'Evento oficial atualizado.',
+        ])->assertRedirect(route('tournaments.show', $tournament));
+
+        $this->assertDatabaseHas('tournaments', ['id' => $tournament->id, 'title' => 'Open Eldritch Atualizado']);
+
+        $this->actingAs($organizer)->patch(route('tournaments.cancel', $tournament))->assertRedirect();
+        $this->assertSame(Tournament::STATUS_CANCELLED, $tournament->fresh()->status);
+    }
+
+    public function test_player_can_cancel_their_registration(): void
+    {
+        $player = User::factory()->create(['type' => 'player']);
+        $tournament = Tournament::factory()->create();
+        TournamentRegistration::create([
+            'tournament_id' => $tournament->id,
+            'user_id' => $player->id,
+            'status' => 'confirmed',
+        ]);
+
+        $this->actingAs($player)->delete(route('tournaments.unregister', $tournament))->assertRedirect();
+        $this->assertDatabaseMissing('tournament_registrations', [
+            'tournament_id' => $tournament->id,
+            'user_id' => $player->id,
+        ]);
+    }
 }

@@ -4,7 +4,10 @@
         <a href="{{ route('tournaments.index') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('tournaments.*') ? 'bottom-nav-link-active' : '' }}"><span>🏆</span><span>Torneios</span></a>
         <a href="{{ route('marketplace') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('marketplace') || request()->routeIs('marketplace.*') ? 'bottom-nav-link-active' : '' }}"><span>🃏</span><span>Cartas</span></a>
         <a href="{{ route('community') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('community') ? 'bottom-nav-link-active' : '' }}"><span>👥</span><span>Comunidade</span></a>
-        <a href="{{ route('premium') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('premium') ? 'bottom-nav-link-active' : '' }}"><span>⭐</span><span>Premium</span></a>
+        @if(auth()->user()->isAdmin())
+            <a href="{{ route('admin.index') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('admin.*') ? 'bottom-nav-link-active' : '' }}"><span>🛡️</span><span>Admin</span></a>
+        @endif
+        <a href="{{ route('account.edit') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('account.*') ? 'bottom-nav-link-active' : '' }}"><span>⚙️</span><span>Conta</span></a>
         <a href="{{ route('life-counter') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('life-counter') ? 'bottom-nav-link-active' : '' }}"><span>❤️</span><span>Vida</span></a>
     </div>
 </nav>

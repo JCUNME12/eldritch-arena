@@ -29,7 +29,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <p class="text-sm font-bold text-arena-cyan">{{ $card->game }}</p>
                         @if($card->highlighted)
-                            <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-2 py-1 text-xs font-bold text-arena-gold">Premium</span>
+                            <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-2 py-1 text-xs font-bold text-arena-gold">Destaque</span>
                         @endif
                     </div>
                     <h2 class="mt-2 text-2xl font-black group-hover:text-arena-cyan">{{ $card->name }}</h2>

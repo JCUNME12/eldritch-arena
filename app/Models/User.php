@@ -16,6 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'type',
+        'is_admin',
         'avatar_color',
         'premium_plan',
         'premium_active',
@@ -32,6 +33,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
             'premium_active' => 'boolean',
             'premium_started_at' => 'datetime',
         ];
@@ -70,6 +72,11 @@ class User extends Authenticatable
     public function isOrganizer(): bool
     {
         return $this->type === 'organizer';
+    }
+
+    public function isAdmin(): bool
+    {
+        return (bool) $this->is_admin;
     }
 
     public function isPremium(): bool

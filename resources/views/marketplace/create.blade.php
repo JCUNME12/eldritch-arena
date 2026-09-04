@@ -3,7 +3,7 @@
         <section class="arena-card p-6">
             <p class="font-bold text-arena-cyan">Marketplace</p>
             <h1 class="arena-section-title">Vender carta</h1>
-            <p class="mt-2 text-slate-400">Cadastre uma carta para aparecer no marketplace. Anúncios de usuários premium recebem destaque automático.</p>
+            <p class="mt-2 text-slate-400">Cadastre as informações da carta com clareza para facilitar o contato com compradores interessados.</p>
 
             <form method="POST" action="{{ route('marketplace.store') }}" class="mt-6 grid gap-4">
                 @csrf
@@ -80,16 +80,19 @@
         </section>
 
         <aside class="arena-card p-6">
-            <h2 class="text-2xl font-black text-white">Como funciona a monetização</h2>
-            <p class="mt-3 text-slate-400">No modo gratuito, o player ou lojista consegue cadastrar cartas normalmente. No modo premium, o anúncio ganha destaque visual no marketplace.</p>
-
-            <div class="mt-5 rounded-3xl border border-arena-gold/30 bg-arena-gold/10 p-5">
-                <p class="text-sm font-bold uppercase tracking-wide text-arena-gold">Status atual</p>
-                <p class="mt-2 text-xl font-black text-white">{{ auth()->user()->isPremium() ? 'Premium ativo' : 'Plano gratuito' }}</p>
-                <p class="mt-2 text-sm text-slate-300">{{ auth()->user()->isPremium() ? 'Suas cartas serão destacadas automaticamente.' : 'Assine o plano premium simulado para destacar seus anúncios na apresentação.' }}</p>
+            <h2 class="text-2xl font-black text-white">Boas práticas para anunciar</h2>
+            <div class="mt-5 grid gap-3 text-sm text-slate-300">
+                <p class="rounded-2xl border border-white/10 bg-white/5 p-4">Informe corretamente a edição, a raridade e o estado de conservação.</p>
+                <p class="rounded-2xl border border-white/10 bg-white/5 p-4">Use uma imagem nítida e atual da carta sempre que possível.</p>
+                <p class="rounded-2xl border border-white/10 bg-white/5 p-4">Combine pagamento e entrega com segurança antes de concluir a negociação.</p>
             </div>
 
-            <a href="{{ route('premium') }}" class="arena-btn mt-5 w-full text-center">Ver planos premium</a>
+            @if(auth()->user()->isPremium())
+                <div class="mt-5 rounded-3xl border border-arena-gold/30 bg-arena-gold/10 p-5">
+                    <p class="font-black text-arena-gold">Conta com destaque ativo</p>
+                    <p class="mt-2 text-sm text-slate-300">Seu anúncio receberá destaque editorial no marketplace.</p>
+                </div>
+            @endif
         </aside>
     </div>
 </x-layouts.app>

@@ -45,16 +45,7 @@ class MarketplaceController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'game' => ['required', 'string', Rule::in(self::GAMES)],
-            'edition' => ['nullable', 'string', 'max:120'],
-            'rarity' => ['required', 'string', Rule::in(self::RARITIES)],
-            'condition' => ['required', 'string', Rule::in(self::CONDITIONS)],
-            'description' => ['nullable', 'string', 'max:1000'],
-            'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
-            'image_url' => ['nullable', 'url', 'max:500'],
-        ]);
+        $validated = $this->validateListing($request);
 
         $user = Auth::user();
 
@@ -77,5 +68,65 @@ class MarketplaceController extends Controller
         return view('marketplace.show', [
             'card' => $cardListing,
         ]);
+    }
+
+    public function edit(Request $request, CardListing $cardListing): View
+    {
+        $this->authorizeOwner($request, $cardListing);
+
+        return view('marketplace.edit', [
+            'card' => $cardListing,
+            'games' => self::GAMES,
+            'conditions' => self::CONDITIONS,
+            'rarities' => self::RARITIES,
+        ]);
+    }
+
+    public function update(Request $request, CardListing $cardListing): RedirectResponse
+    {
+        $this->authorizeOwner($request, $cardListing);
+        $validated = $this->validateListing($request);
+
+        $cardListing->update([
+            ...$validated,
+            'seller_name' => $cardListing->user?->name ?? $cardListing->seller_name,
+            'seller_type' => $cardListing->user?->isOrganizer() ? 'loja' : 'player',
+            'contact_email' => $cardListing->user?->email ?? $cardListing->contact_email,
+        ]);
+
+        return redirect()
+            ->route('marketplace.show', $cardListing)
+            ->with('status', 'Anúncio atualizado com sucesso.');
+    }
+
+    public function destroy(Request $request, CardListing $cardListing): RedirectResponse
+    {
+        $this->authorizeOwner($request, $cardListing);
+        $cardListing->delete();
+
+        return redirect()->route('marketplace')->with('status', 'Anúncio removido do marketplace.');
+    }
+
+    /** @return array<string, mixed> */
+    private function validateListing(Request $request): array
+    {
+        return $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'game' => ['required', 'string', Rule::in(self::GAMES)],
+            'edition' => ['nullable', 'string', 'max:120'],
+            'rarity' => ['required', 'string', Rule::in(self::RARITIES)],
+            'condition' => ['required', 'string', Rule::in(self::CONDITIONS)],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
+            'image_url' => ['nullable', 'url', 'max:500'],
+        ]);
+    }
+
+    private function authorizeOwner(Request $request, CardListing $cardListing): void
+    {
+        abort_unless(
+            $request->user()->isAdmin() || $request->user()->id === $cardListing->user_id,
+            403
+        );
     }
 }

@@ -26,7 +26,6 @@ services:
       CACHE_STORE: database
       QUEUE_CONNECTION: database
       LOG_CHANNEL: stderr
-      DEMO_PREMIUM_SUBSCRIPTION: "${DEMO_PREMIUM_SUBSCRIPTION:-true}"
       RUN_MIGRATIONS: "true"
     volumes:
       - eldritch_storage:/var/www/html/storage/app/public

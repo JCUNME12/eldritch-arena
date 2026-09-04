@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ApplicationHealthTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_public_pages_and_health_endpoint_are_available(): void
     {
         $this->get('/')->assertOk();

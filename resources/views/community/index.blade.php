@@ -8,12 +8,6 @@
         <a href="{{ route('community.create') }}" class="arena-btn">Criar novo tópico</a>
     </div>
 
-    @if(session('success'))
-        <div class="mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm font-bold text-emerald-200">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="mt-6 grid gap-5 lg:grid-cols-[1.3fr_.7fr]">
         <section class="grid gap-4">
             @forelse($topics as $topic)
@@ -90,7 +84,7 @@
                 <div class="mt-4 grid gap-3 text-sm text-slate-300">
                     <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Crie tópicos para pedir ajuda com decks, divulgar eventos ou negociar cartas.</p>
                     <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Anexe imagens para mostrar cartas, prints de decklists ou registros de torneios.</p>
-                    <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Reaja com joinha, coração, fogo, ideia ou aplauso para simular engajamento real.</p>
+                    <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Use reações para destacar contribuições úteis, novidades e boas ideias.</p>
                 </div>
             </div>
         </aside>

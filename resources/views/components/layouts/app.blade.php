@@ -18,6 +18,16 @@
                 {{ session('status') }}
             </div>
         @endif
+        @if (session('success'))
+            <div class="mb-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-200">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if ($errors->any())
+            <div class="mb-5 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-200">
+                {{ $errors->first() }}
+            </div>
+        @endif
         {{ $slot ?? '' }}
         @yield('content')
     </main>

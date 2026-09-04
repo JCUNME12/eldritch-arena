@@ -18,7 +18,7 @@
             <div class="flex flex-wrap items-center gap-2">
                 <span class="rounded-full border border-arena-cyan/40 bg-arena-cyan/10 px-3 py-1 text-sm font-bold text-arena-cyan">{{ $card->game }}</span>
                 @if($card->highlighted)
-                    <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-3 py-1 text-sm font-bold text-arena-gold">Anúncio premium</span>
+                    <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-3 py-1 text-sm font-bold text-arena-gold">Anúncio em destaque</span>
                 @endif
             </div>
 
@@ -39,7 +39,7 @@
                 <div class="rounded-3xl border border-white/10 bg-black/20 p-5">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Contato</p>
                     <p class="mt-2 break-all text-sm font-bold text-arena-cyan">{{ $card->contact_email ?? 'Contato pelo marketplace' }}</p>
-                    <p class="mt-1 text-sm text-slate-400">Contato demonstrativo para o TCC.</p>
+                    <p class="mt-1 text-sm text-slate-400">Combine pagamento, entrega e verificação da carta diretamente com o vendedor.</p>
                 </div>
             </div>
 
@@ -51,6 +51,10 @@
             <div class="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a href="mailto:{{ $card->contact_email }}?subject=Tenho interesse na carta {{ urlencode($card->name) }}" class="arena-btn text-center">Tenho interesse</a>
                 <a href="{{ route('marketplace.create') }}" class="arena-btn-secondary text-center">Anunciar outra carta</a>
+                @if(auth()->user()->isAdmin() || auth()->id() === $card->user_id)
+                    <a href="{{ route('marketplace.edit', $card) }}" class="arena-btn-secondary text-center">Editar anúncio</a>
+                    <form method="POST" action="{{ route('marketplace.destroy', $card) }}" onsubmit="return confirm('Remover este anúncio do marketplace?')">@csrf @method('DELETE')<button class="arena-btn-secondary w-full border-red-400/40 text-red-200 hover:bg-red-500/10">Excluir</button></form>
+                @endif
             </div>
         </section>
     </div>

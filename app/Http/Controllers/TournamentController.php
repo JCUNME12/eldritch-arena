@@ -36,16 +36,7 @@ class TournamentController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'game' => ['required', 'string', 'max:80'],
-            'starts_at' => ['required', 'date', 'after:now'],
-            'prize' => ['required', 'string', 'max:255'],
-            'entry_fee' => ['required', 'numeric', 'min:0'],
-            'slots' => ['required', 'integer', 'min:2', 'max:256'],
-            'location' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-        ]);
+        $data = $this->validateTournament($request);
 
         $data['organizer_id'] = $request->user()->id;
         $data['highlighted'] = $request->user()->isPremium();
@@ -54,6 +45,29 @@ class TournamentController extends Controller
         $tournament = Tournament::create($data);
 
         return redirect()->route('tournaments.show', $tournament)->with('status', 'Torneio criado e publicado na Arena.');
+    }
+
+    public function edit(Request $request, Tournament $tournament): View
+    {
+        $this->authorizeOrganizer($request, $tournament);
+
+        return view('tournaments.edit', compact('tournament'));
+    }
+
+    public function update(Request $request, Tournament $tournament): RedirectResponse
+    {
+        $this->authorizeOrganizer($request, $tournament);
+        $tournament->update($this->validateTournament($request));
+
+        return redirect()->route('tournaments.show', $tournament)->with('status', 'Torneio atualizado com sucesso.');
+    }
+
+    public function cancel(Request $request, Tournament $tournament): RedirectResponse
+    {
+        $this->authorizeOrganizer($request, $tournament);
+        $tournament->update(['status' => Tournament::STATUS_CANCELLED]);
+
+        return redirect()->route('tournaments.show', $tournament)->with('status', 'Torneio cancelado. Os participantes poderão ver o novo status.');
     }
 
     public function register(Request $request, Tournament $tournament): RedirectResponse
@@ -89,5 +103,35 @@ class TournamentController extends Controller
         }, attempts: 3);
 
         return back()->with('status', $message);
+    }
+
+    public function unregister(Request $request, Tournament $tournament): RedirectResponse
+    {
+        $deleted = $tournament->registrations()->where('user_id', $request->user()->id)->delete();
+
+        return back()->with('status', $deleted ? 'Sua inscrição foi cancelada.' : 'Você não estava inscrito neste torneio.');
+    }
+
+    /** @return array<string, mixed> */
+    private function validateTournament(Request $request): array
+    {
+        return $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'game' => ['required', 'string', 'max:80'],
+            'starts_at' => ['required', 'date', 'after:now'],
+            'prize' => ['required', 'string', 'max:255'],
+            'entry_fee' => ['required', 'numeric', 'min:0', 'max:999999.99'],
+            'slots' => ['required', 'integer', 'min:2', 'max:256'],
+            'location' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:5000'],
+        ]);
+    }
+
+    private function authorizeOrganizer(Request $request, Tournament $tournament): void
+    {
+        abort_unless(
+            $request->user()->isAdmin() || $request->user()->id === $tournament->organizer_id,
+            403
+        );
     }
 }

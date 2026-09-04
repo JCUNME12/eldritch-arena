@@ -4,14 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\CardListing;
 use App\Models\Tournament;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request): View|RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.index');
+        }
 
         if ($user->isOrganizer()) {
             return view('dashboard.organizer', [

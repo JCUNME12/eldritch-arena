@@ -31,12 +31,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="mb-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm font-bold text-emerald-200">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <article class="arena-card p-6">
         <p class="whitespace-pre-line text-slate-300">{{ $topic->body }}</p>
 
@@ -93,7 +87,7 @@
                     <div class="flex flex-wrap items-center gap-2 text-sm">
                         <span class="font-bold text-white">{{ $comment->user?->name ?? 'Usuário' }}</span>
                         @if($comment->user?->isPremium())
-                            <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-2 py-0.5 text-xs font-black uppercase text-arena-gold">Premium</span>
+                            <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-2 py-0.5 text-xs font-black uppercase text-arena-gold">Parceiro</span>
                         @endif
                         <span class="text-slate-500">{{ $comment->created_at->diffForHumans() }}</span>
                         @if($comment->updated_at->gt($comment->created_at->copy()->addMinute()))

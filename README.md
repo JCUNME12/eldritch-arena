@@ -8,7 +8,7 @@ Plataforma web para jogadores, organizadores e comunidades de card games. O proj
 - PostgreSQL como banco principal.
 - Docker Compose para desenvolvimento e produção.
 - Migração assistida do antigo SQLite para PostgreSQL.
-- Testes automatizados de autenticação, torneios, marketplace, comunidade e recursos premium.
+- Testes automatizados de autenticação, conta, administração, torneios, marketplace e comunidade.
 - Pipeline no GitHub Actions com testes, análise de estilo, auditoria e build da imagem.
 
 ## Tecnologias
@@ -25,12 +25,13 @@ Plataforma web para jogadores, organizadores e comunidades de card games. O proj
 ## Funcionalidades
 
 - Cadastro, login, logout e perfis de jogador ou organizador.
-- Criação de torneios por organizadores.
-- Inscrições protegidas contra duplicidade, lotação e eventos encerrados.
-- Marketplace de cartas com catálogo validado.
+- Criação, edição e cancelamento de torneios por organizadores.
+- Inscrições protegidas contra duplicidade e lotação, com cancelamento pelo jogador.
+- Marketplace de cartas com catálogo validado e gestão dos próprios anúncios.
 - Comunidade com tópicos, comentários, imagens e reações.
 - Contador de vida para partidas.
-- Demonstração de planos premium apenas quando habilitada explicitamente.
+- Área de conta para atualização de perfil e senha.
+- Painel administrativo para permissões, torneios, anúncios e moderação.
 
 ## Execução local com Docker
 
@@ -50,7 +51,7 @@ php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"
 docker compose up -d --build
 ```
 
-5. Para carregar os dados de demonstração, execute uma vez:
+5. Para carregar conteúdo inicial no ambiente de desenvolvimento, execute uma vez:
 
 ```bash
 docker compose exec app php artisan db:seed --force
@@ -110,6 +111,16 @@ npm run build
 
 O pipeline repete essas verificações usando PostgreSQL real e, depois, constrói a imagem de produção.
 
+## Criar um administrador
+
+Execute o comando abaixo em um terminal interativo. A senha é solicitada de forma oculta e não é armazenada no histórico nem no repositório:
+
+```bash
+docker compose exec app php artisan app:admin admin@example.com --name="Administrador"
+```
+
+Para automações, o comando também aceita a senha pela variável temporária `ELDRITCH_ADMIN_PASSWORD`. Remova essa variável do ambiente após o uso.
+
 ## Publicação na AWS
 
 A arquitetura indicada separa aplicação e banco:
@@ -134,13 +145,13 @@ No Portainer, use o repositório Git e informe `compose.production.yaml` como ca
 - A conexão com PostgreSQL exige SSL por padrão.
 - Login, cadastro e gravações sensíveis possuem limitação de tentativas.
 - Apenas organizadores criam torneios.
-- A ativação premium simulada fica desabilitada em produção.
+- O painel administrativo exige uma conta marcada explicitamente como administradora.
 - O processo de inicialização executa migrations e só inicia após o banco responder.
-- Não execute `db:seed` em produção: os usuários demonstrativos possuem senha conhecida.
+- Não execute `db:seed` em produção: o seeder é destinado somente ao desenvolvimento local.
 
-## Dados demonstrativos
+## Contas locais de desenvolvimento
 
-Somente para desenvolvimento, após `db:seed`:
+Somente para desenvolvimento, após `db:seed`. Essas credenciais não são exibidas pela interface:
 
 | Perfil | E-mail | Senha |
 |---|---|---|
@@ -153,4 +164,4 @@ As decisões de arquitetura, segurança, banco e implantação estão detalhadas
 
 ## Licença
 
-Projeto acadêmico desenvolvido por João Carlos Campos.
+Projeto Eldritch Arena, desenvolvido por João Carlos Campos.
