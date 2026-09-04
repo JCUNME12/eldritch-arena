@@ -21,4 +21,14 @@ class ApplicationHealthTest extends TestCase
     {
         $this->get('/dashboard')->assertRedirect('/login');
     }
+
+    public function test_service_worker_never_caches_dynamic_pages(): void
+    {
+        $serviceWorker = file_get_contents(public_path('service-worker.js'));
+
+        $this->assertIsString($serviceWorker);
+        $this->assertStringContainsString("request.mode === 'navigate'", $serviceWorker);
+        $this->assertStringContainsString('caches.delete(cacheName)', $serviceWorker);
+        $this->assertStringNotContainsString("const URLS = ['/", $serviceWorker);
+    }
 }
