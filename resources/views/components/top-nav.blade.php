@@ -1,6 +1,6 @@
 <nav class="relative z-20 border-b border-white/10 bg-black/25 backdrop-blur-xl">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="{{ route('home') }}" class="flex items-center gap-3">
+        <a href="{{ auth()->check() ? route('home.auth') : route('home') }}" class="flex items-center gap-3">
             <div class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-arena-purple to-arena-cyan shadow-neon">⚔</div>
             <div>
                 <p class="font-display text-lg font-black tracking-wide text-white">Eldritch Arena</p>

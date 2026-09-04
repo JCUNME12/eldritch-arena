@@ -23,6 +23,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/inicio', HomeController::class)->name('home.auth');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::patch('/perfil/tipo', [ProfileTypeController::class, 'update'])->middleware('throttle:writes')->name('profile.type');
