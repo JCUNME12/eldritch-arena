@@ -13,7 +13,6 @@
                 <a href="{{ route('dashboard') }}" class="arena-btn-secondary">Dashboard</a>
                 <a href="{{ route('tournaments.index') }}" class="arena-btn-secondary">Torneios</a>
                 <a href="{{ route('marketplace') }}" class="arena-btn-secondary">Marketplace</a>
-                <a href="{{ route('marketplace.create') }}" class="arena-btn-secondary">Vender Carta</a>
                 <a href="{{ route('community') }}" class="arena-btn-secondary">Comunidade</a>
                 @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.index') }}" class="arena-btn-secondary border-arena-gold/40 text-arena-gold">Admin</a>
