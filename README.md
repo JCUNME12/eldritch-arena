@@ -52,7 +52,7 @@ O protótipo concentra as responsabilidades essenciais para uma plataforma inici
 | Tecnologia | Uso no Projeto |
 |---|---|
 | **PHP** | Linguagem principal do backend |
-| **Laravel 11** | Framework MVC utilizado para rotas, controllers, models, migrations e views |
+| **Laravel 13** | Framework MVC utilizado para rotas, controllers, models, migrations e views |
 | **Blade** | Engine de templates para construção das telas |
 | **MySQL/MariaDB** | Banco de dados recomendado para execução local via XAMPP |
 | **Tailwind CSS** | Estilização responsiva com identidade visual dark gamer |
@@ -179,7 +179,7 @@ A aplicação inclui `manifest.json` e `service-worker.js`, preparando o caminho
 
 ## 🚀 Como Executar Localmente
 
-Antes de iniciar, garanta que o ambiente tenha **PHP**, **Composer**, **Node.js**, **npm** e um banco **MySQL/MariaDB** disponíveis. Em ambiente Windows, o projeto pode ser executado com XAMPP para facilitar a configuração do Apache, PHP e MySQL.
+Antes de iniciar, garanta que o ambiente tenha **PHP 8.4.1 ou superior (8.x)**, **Composer**, **Node.js**, **npm** e um banco **MySQL/MariaDB** disponíveis. Em ambiente Windows, o projeto pode ser executado com XAMPP para facilitar a configuração do Apache, PHP e MySQL.
 
 ```bash
 # 1. Clonar o repositório
@@ -294,7 +294,7 @@ O protótipo foi construído para permitir crescimento gradual. As próximas eta
 
 ## 📚 Referências
 
-[1]: https://laravel.com/docs/11.x "Laravel 11 Documentation"  
+[1]: https://laravel.com/docs/13.x "Laravel 13 Documentation"
 [2]: https://tailwindcss.com/docs "Tailwind CSS Documentation"  
 [3]: https://vite.dev/guide/ "Vite Guide"  
 [4]: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps "MDN Web Docs — Progressive Web Apps"  

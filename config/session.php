@@ -4,6 +4,9 @@ use Illuminate\Support\Str;
 
 return [
 
+    // Preserve existing sessions during the Laravel 13 upgrade.
+    'serialization' => 'php',
+
     /*
     |--------------------------------------------------------------------------
     | Default Session Driver

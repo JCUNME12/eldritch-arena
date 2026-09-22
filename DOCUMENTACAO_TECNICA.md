@@ -126,7 +126,7 @@ Esta primeira etapa foi planejada como protótipo acadêmico. Portanto, algumas 
 
 ## Referências
 
-[1]: https://laravel.com/docs/11.x "Laravel 11 Documentation"  
+[1]: https://laravel.com/docs/13.x "Laravel 13 Documentation"
 [2]: https://tailwindcss.com/docs "Tailwind CSS Documentation"  
 [3]: https://vite.dev/guide/ "Vite Guide"  
 [4]: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps "MDN Web Docs — Progressive Web Apps"  
