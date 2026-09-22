@@ -54,7 +54,7 @@ O protótipo concentra as responsabilidades essenciais para uma plataforma inici
 | **PHP** | Linguagem principal do backend |
 | **Laravel 13** | Framework MVC utilizado para rotas, controllers, models, migrations e views |
 | **Blade** | Engine de templates para construção das telas |
-| **MySQL/MariaDB** | Banco de dados recomendado para execução local via XAMPP |
+| **PostgreSQL 18** | Banco de dados local, com caminho de hospedagem no Amazon RDS |
 | **Tailwind CSS** | Estilização responsiva com identidade visual dark gamer |
 | **Alpine.js** | Interações leves no frontend |
 | **Chart.js** | Base para gráficos e indicadores visuais |
@@ -179,7 +179,7 @@ A aplicação inclui `manifest.json` e `service-worker.js`, preparando o caminho
 
 ## 🚀 Como Executar Localmente
 
-Antes de iniciar, garanta que o ambiente tenha **PHP 8.4.1 ou superior (8.x)**, **Composer**, **Node.js**, **npm** e um banco **MySQL/MariaDB** disponíveis. Em ambiente Windows, o projeto pode ser executado com XAMPP para facilitar a configuração do Apache, PHP e MySQL.
+Antes de iniciar, garanta que o ambiente tenha **PHP 8.4.1 ou superior (8.x)**, **Composer**, **Node.js**, **npm** e um banco **PostgreSQL 18** disponíveis. No Windows, veja [POSTGRESQL.md](POSTGRESQL.md) para iniciar o banco local e executar testes. O PHP precisa da extensão pdo_pgsql.
 
 ```bash
 # 1. Clonar o repositório
@@ -198,9 +198,12 @@ cp .env.example .env
 # 5. Gerar chave da aplicação
 php artisan key:generate
 
-# 6. Configurar o banco no .env
+# 6. Criar o banco e usuario no PostgreSQL e configurar o .env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
 DB_DATABASE=eldritch_arena
-DB_USERNAME=root
+DB_USERNAME=eldritch_app
 DB_PASSWORD=
 
 # 7. Rodar migrations e seeders
