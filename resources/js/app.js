@@ -2,7 +2,9 @@ import "./bootstrap";
 import Alpine from "alpinejs";
 
 import lifeCounter from "./life-counter";
+import schemeDeck from "./scheme-deck";
 Alpine.data("lifeCounter", lifeCounter);
+Alpine.data("schemeDeck", schemeDeck);
 window.Alpine = Alpine;
 Alpine.start();
 

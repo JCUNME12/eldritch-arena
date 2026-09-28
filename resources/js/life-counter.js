@@ -168,25 +168,13 @@ export const presets = {
         commanderDamage: true,
     },
     archenemy: {
-        name: "Magic · Archenemy · clássico",
-        life: 20,
-        count: 4,
-        step: 1,
-        magic: true,
-        description:
-            "Jogador 1 é o arqui-inimigo: 40 de vida e primeiro turno. Aliados têm 20 cada, sem compartilhar vida. Use seu baralho de esquemas.",
-        layout: "archenemy",
-        minCount: 4,
-        leaderLife: 40,
-    },
-    archenemy_commander: {
-        name: "Magic · Archenemy · Commander",
+        name: "Magic · Archenemy",
         life: 60,
         count: 4,
         step: 1,
         magic: true,
         description:
-            "Arqui-inimigo: 60 de vida e primeiro turno. Aliados compartilham 60 de vida; veneno e dano de comandante continuam individuais. Use seu baralho de esquemas.",
+            "Regras de Archenemy Commander: arqui-inimigo com 60 de vida e primeiro turno; aliados compartilham 60. Veneno e dano de comandante são individuais. Prepare o baralho de esquemas abaixo.",
         layout: "archenemy_shared",
         minCount: 4,
         commanderDamage: true,
@@ -291,9 +279,13 @@ export default function lifeCounter() {
         result: "",
         customAmount: 100,
         storageError: false,
+        migrationNotice: "",
         init() {
             try {
                 const s = JSON.parse(localStorage.getItem(key));
+                const oldClassic =
+                    s?.format === "archenemy" && s.rulesVersion !== 3;
+                if (s?.format === "archenemy_commander") s.format = "archenemy";
                 if (
                     s &&
                     Object.hasOwn(presets, s.format) &&
@@ -328,6 +320,21 @@ export default function lifeCounter() {
                             ),
                     )
                 ) {
+                    if (oldClassic) {
+                        const teamLife = Math.max(
+                            -999999,
+                            Math.min(
+                                999999,
+                                s.players
+                                    .slice(1)
+                                    .reduce((total, p) => total + p.life, 0),
+                            ),
+                        );
+                        s.players.slice(1).forEach((p) => (p.life = teamLife));
+                        s.initial = 60;
+                        this.migrationNotice =
+                            "Mesa antiga adaptada: a vida restante dos aliados foi somada em um total compartilhado. A vida atual do arqui-inimigo foi preservada; ao reiniciar, ambos os lados começam com 60.";
+                    }
                     this.format = s.format;
                     this.initial = s.initial;
                     this.players = s.players;
@@ -428,6 +435,7 @@ export default function lifeCounter() {
                 localStorage.setItem(
                     key,
                     JSON.stringify({
+                        rulesVersion: 3,
                         format: this.format,
                         initial: this.initial,
                         players: this.players,
@@ -571,6 +579,7 @@ export default function lifeCounter() {
                 this.pendingStart = true;
                 return;
             }
+            this.migrationNotice = "";
             this.format = this.draftFormat;
             this.initial = life;
             this.step = presets[this.format].step;

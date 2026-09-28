@@ -12,6 +12,7 @@
 <button class="arena-btn-secondary" @click="undo()" :disabled="!history.length">Desfazer</button>
 <button class="arena-btn-secondary" @click="tools=!tools">Dados e moeda</button>
 <button class="arena-btn-secondary" @click="fullscreen()">Tela cheia</button>
+<a x-show="format==='archenemy'" class="arena-btn-secondary" href="#scheme-deck">Esquemas</a>
 </div>
 </header>
  <div class="arena-card p-4 mb-4 text-sm text-slate-300" x-show="presets[format].description">
@@ -19,6 +20,7 @@
  <p class="mt-2" x-show="initial!==presets[format].life" x-text="'Pontos iniciais personalizados nesta mesa: '+initial+(presets[format].leaderLife ? ' por aliado; arqui-inimigo: '+presets[format].leaderLife : '')"></p>
  </div>
  <p x-show="storageError" x-cloak class="p-3 text-amber-200">Não foi possível restaurar ou salvar a mesa neste navegador.</p>
+ <p x-show="migrationNotice" x-cloak class="p-3 text-amber-200" x-text="migrationNotice"></p>
  <div class="players-grid" :class="'players-'+players.length">
  <template x-for="(player,index) in players" :key="player.id">
 <section class="player-zone" :style="{'--player-color':player.color,'--digits':Math.max(2,String(player.life).length)}" :class="{'player-rotated':player.rotated}">
@@ -58,6 +60,7 @@
 </section>
 </template>
  </div>
+ <template x-if="format==='archenemy'"><div id="scheme-deck">@include('life-counter.schemes')</div></template>
  <footer class="table-footer">
 <span>Salvo neste navegador · funciona sem conexão após abrir a mesa</span>
 <div class="flex gap-4">

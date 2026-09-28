@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test:counter": "node --test tests/life-counter.test.js"
+    "test:counter": "node --test tests/life-counter.test.js tests/scheme-deck.test.js"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",

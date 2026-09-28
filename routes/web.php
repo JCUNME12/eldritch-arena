@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/contador-de-vida', LifeCounterController::class)->name('life-counter');
+Route::view('/esquemas', 'schemes')->name('schemes');
 
 Route::middleware('guest')->group(function () {
     Route::get('/cadastro', [RegisteredUserController::class, 'create'])->name('register');

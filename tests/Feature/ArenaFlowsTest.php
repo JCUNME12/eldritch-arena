@@ -12,6 +12,12 @@ class ArenaFlowsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_scheme_companion_and_counter_render_for_guests(): void
+    {
+        $this->get('/esquemas')->assertOk()->assertSee('Baralho de esquemas')->assertSee('Embaralhar e começar');
+        $this->get('/contador-de-vida')->assertOk()->assertSee('Baralho de esquemas');
+    }
+
     private function tournament(array $overrides = []): Tournament
     {
         return Tournament::create(array_merge([
@@ -130,7 +136,7 @@ class ArenaFlowsTest extends TestCase
     public function test_new_magic_formats_can_be_used_for_events_but_not_other_games(): void
     {
         $this->actingAs(User::factory()->create());
-        foreach (['Vintage', 'Gigante de Duas Cabeças', 'Archenemy · Commander', 'Oathbreaker', 'Conspiracy', 'Pick-Two Draft', 'Booster Draft por Equipes'] as $format) {
+        foreach (['Vintage', 'Gigante de Duas Cabeças', 'Archenemy', 'Oathbreaker', 'Conspiracy', 'Pick-Two Draft', 'Booster Draft por Equipes'] as $format) {
             $this->post('/torneios', [
                 'title' => 'Mesa '.$format, 'game' => 'Magic', 'format' => $format,
                 'starts_at' => '2027-03-20T18:00', 'slots' => 16, 'entry_fee' => 0,
