@@ -32,8 +32,8 @@ Para instalar dados fictícios em um ambiente local novo: `php artisan db:seed`.
 
 ## Verificações
 
-- 15 testes PHP, 105 assertions (SQLite e PostgreSQL).
-- 8 testes JavaScript: presets, confirmação, histórico, persistência, dano por comandante, marcadores, reinício, dados e recuperação de armazenamento.
+- 16 testes PHP, 109 assertions (SQLite e PostgreSQL), incluindo entradas malformadas e conversão de fuso horário.
+- 10 testes JavaScript: presets, confirmação, histórico, personalização, persistência, dano por comandante, marcadores, reinício, dados e recuperação de armazenamento.
 - Build Vite, compilação das views e revisão no navegador em desktop e celular.
 - Fluxos no navegador: login, painel, formato dependente do jogo, Commander, veneno, dano, restauração, dados, Yu-Gi-Oh! e desfazer.
 
@@ -52,5 +52,5 @@ Backup, monitoramento e recuperação de dados da hospedagem continuam sendo nec
 ## Publicação
 
 Branch: `feature/arena-professional`. Checkpoint: `checkpoint/pre-arena-professional-20260928`.
-Esta revisão é local e versionada no GitHub; a instância AWS não é atualizada automaticamente pelo push.
+Esta revisão é local e versionada no GitHub; a instância AWS não é atualizada automaticamente pelo push. Joao escolheu revisar localmente antes da publicação desta reformulação.
 Para publicar, gerar backup do banco e do código vigente, levar a revisão testada com assets compilados, manter o `.env` da nuvem, aplicar as migrations e verificar HTTPS/login/uploads. Não copiar `.env` local, chaves, logs, dump ou banco de testes.

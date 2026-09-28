@@ -118,4 +118,12 @@ class ArenaFlowsTest extends TestCase
         ])->assertSessionHasNoErrors();
         $this->assertDatabaseHas('tournaments', ['starts_at' => '2027-03-20 16:00:00']);
     }
+
+    public function test_malformed_game_input_returns_validation_errors_instead_of_server_error(): void
+    {
+        $this->actingAs(User::factory()->create())->post('/torneios', [
+            'game' => ['Magic'], 'format' => ['Commander'],
+        ])->assertSessionHasErrors(['game', 'format']);
+        $this->assertDatabaseCount('tournaments', 0);
+    }
 }

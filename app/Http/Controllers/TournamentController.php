@@ -52,9 +52,11 @@ class TournamentController extends Controller
             $request->merge(['game' => 'Magic: The Gathering']);
         }
         $games = config('cardgames');
+        $game = $request->input('game');
+        $formats = is_string($game) ? ($games[$game] ?? []) : [];
         $data = $request->validate([
-            'title' => ['required', 'string', 'max:255'], 'game' => ['required', Rule::in(array_keys($games))],
-            'format' => ['required', Rule::in($games[$request->input('game')] ?? [])],
+            'title' => ['required', 'string', 'max:255'], 'game' => ['required', 'string', Rule::in(array_keys($games))],
+            'format' => ['required', 'string', Rule::in($formats)],
             'starts_at' => ['required', 'date'], 'prize' => ['required', 'string', 'max:255'],
             'entry_fee' => ['required', 'numeric', 'min:0', 'max:999999.99'], 'slots' => ['required', 'integer', 'min:2', 'max:256'],
             'location' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:5000'],

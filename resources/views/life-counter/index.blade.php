@@ -22,7 +22,7 @@
 <div class="flex items-center justify-between gap-2">
 <span class="player-number" x-text="String(index+1).padStart(2,'0')">
 </span>
-<input class="player-name" :aria-label="'Nome do jogador '+(index+1)" x-model="player.name" maxlength="30" @change="save()">
+<input class="player-name" :aria-label="'Nome do jogador '+(index+1)" :value="player.name" maxlength="30" @change="updatePlayer(index,'name',$event.target.value);$el.value=player.name">
 <button class="counter-small" @click="active=index" :aria-label="'Configurar '+player.name">•••</button>
 </div>
  <div class="life-controls">
@@ -127,10 +127,10 @@
 </div>
 <div class="flex flex-wrap gap-2 my-4">
 <template x-for="color in colors">
-<button class="color-choice" :style="{background:color}" :aria-label="'Usar cor '+color" @click="players[active].color=color;save()">
+<button class="color-choice" :style="{background:color}" :aria-label="'Usar cor '+color" @click="updatePlayer(active,'color',color)">
 </button>
 </template>
-<button class="arena-btn-secondary" @click="players[active].rotated=!players[active].rotated;save()">Girar 180°</button>
+<button class="arena-btn-secondary" @click="updatePlayer(active,'rotated',!players[active].rotated)">Girar 180°</button>
 </div>
  <label class="arena-label">Ajuste de vida<input type="number" min="1" max="99999" x-model.number="customAmount" class="arena-input my-2">
 </label>

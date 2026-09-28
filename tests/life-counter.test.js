@@ -95,3 +95,24 @@ test("dice remain in range", () => {
             assert.ok(n >= 0 && n < sides);
         }
 });
+
+test("personalization participates in undo without losing later names", () => {
+    const c = counter();
+    c.change(0, -1);
+    c.updatePlayer(0, "name", "Joao");
+    c.undo();
+    assert.equal(c.players[0].name, "Jogador 1");
+    assert.equal(c.players[0].life, 19);
+    c.undo();
+    assert.equal(c.players[0].life, 20);
+});
+
+test("a new table clears a pending reset confirmation", () => {
+    const c = counter();
+    c.reset();
+    c.pendingStart = true;
+    c.start();
+    c.change(0, -2);
+    c.reset();
+    assert.equal(c.players[0].life, 18);
+});

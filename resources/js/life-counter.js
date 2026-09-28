@@ -150,6 +150,20 @@ export default function lifeCounter() {
             });
             this.history = this.history.slice(0, 60);
         },
+        updatePlayer(index, field, value) {
+            const player = this.players[index];
+            if (!player || !["name", "color", "rotated"].includes(field))
+                return;
+            if (field === "name")
+                value =
+                    String(value).trim().slice(0, 30) || `Jogador ${index + 1}`;
+            if (field === "color" && !colors.includes(value)) return;
+            if (field === "rotated") value = Boolean(value);
+            if (player[field] === value) return;
+            this.checkpoint(`Personalizar ${player.name}`);
+            player[field] = value;
+            this.save();
+        },
         change(i, delta, field = "life") {
             delta = Number(delta);
             if (
@@ -160,7 +174,7 @@ export default function lifeCounter() {
                 return;
             const p = this.players[i];
             this.checkpoint(
-                `${p.name}: ${field === "life" ? "vida" : field} ${delta > 0 ? "+" : ""}${delta}`,
+                `${p.name}: ${{ life: "vida", poison: "veneno", energy: "energia", experience: "experiência" }[field]} ${delta > 0 ? "+" : ""}${delta}`,
             );
             p[field] = Math.max(
                 field === "life" ? -999999 : 0,
@@ -223,6 +237,7 @@ export default function lifeCounter() {
             this.step = presets[this.format].step;
             this.players = newPlayers(count, life);
             this.history = [];
+            this.pendingReset = false;
             this.result = "";
             this.settings = false;
             this.active = null;
