@@ -126,4 +126,22 @@ class ArenaFlowsTest extends TestCase
         ])->assertSessionHasErrors(['game', 'format']);
         $this->assertDatabaseCount('tournaments', 0);
     }
+
+    public function test_new_magic_formats_can_be_used_for_events_but_not_other_games(): void
+    {
+        $this->actingAs(User::factory()->create());
+        foreach (['Vintage', 'Gigante de Duas Cabeças', 'Archenemy · Commander', 'Oathbreaker', 'Conspiracy', 'Pick-Two Draft', 'Booster Draft por Equipes'] as $format) {
+            $this->post('/torneios', [
+                'title' => 'Mesa '.$format, 'game' => 'Magic', 'format' => $format,
+                'starts_at' => '2027-03-20T18:00', 'slots' => 16, 'entry_fee' => 0,
+                'prize' => 'Cartas', 'location' => 'Loja',
+            ])->assertSessionHasNoErrors();
+            $this->assertDatabaseHas('tournaments', ['format' => $format]);
+        }
+        $this->post('/torneios', [
+            'title' => 'Formato incorreto', 'game' => 'Pokémon', 'format' => 'Oathbreaker',
+            'starts_at' => '2027-03-20T18:00', 'slots' => 16, 'entry_fee' => 0,
+            'prize' => 'Cartas', 'location' => 'Loja',
+        ])->assertSessionHasErrors('format');
+    }
 }

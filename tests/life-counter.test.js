@@ -2,6 +2,135 @@ import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import counter, { newPlayers, presets } from "../resources/js/life-counter.js";
 let saved;
+function table(format) {
+    const c = counter();
+    c.draftFormat = format;
+    c.choosePreset();
+    c.start();
+    c.start();
+    return c;
+}
+test("every preset starts, persists and resets without losing its format", () => {
+    for (const format of Object.keys(presets)) {
+        const c = table(format);
+        assert.equal(c.format, format);
+        c.change(0, -3);
+        const restored = counter();
+        restored.init();
+        assert.deepEqual(restored.players, c.players);
+        assert.equal(restored.format, format);
+        restored.reset();
+        restored.reset();
+        assert.equal(
+            restored.players[0].life,
+            presets[format].leaderLife || presets[format].life,
+        );
+    }
+});
+test("Two-Headed Giant shares life and poison but keeps energy individual, including undo", () => {
+    const c = table("two_headed");
+    c.change(1, -7);
+    assert.deepEqual(
+        c.players.map((p) => p.life),
+        [23, 23, 30, 30],
+    );
+    c.change(0, 14, "poison");
+    assert.equal(c.warning(c.players[1]), "");
+    c.change(1, 1, "poison");
+    assert.match(c.warning(c.players[0]), /15/);
+    c.undo();
+    assert.deepEqual(
+        c.players.map((p) => p.poison),
+        [14, 14, 0, 0],
+    );
+    c.change(0, 3, "energy");
+    assert.equal(c.players[1].energy, 0);
+});
+test("team commander damage reduces shared life but remains separate per recipient", () => {
+    const c = table("two_headed_commander");
+    c.damage(0, 2, 0, 20);
+    c.damage(1, 2, 0, 1);
+    assert.deepEqual(
+        c.players.map((p) => p.life),
+        [39, 39, 60, 60],
+    );
+    assert.equal(c.warning(c.players[0]), "");
+    c.damage(0, 2, 0, 1);
+    assert.match(c.warning(c.players[0]), /21/);
+    assert.equal(c.warning(c.players[1]), "");
+});
+test("classic Archenemy resets asymmetric life and assigns first turn", () => {
+    const c = table("archenemy");
+    assert.deepEqual(
+        c.players.map((p) => p.life),
+        [40, 20, 20, 20],
+    );
+    c.change(1, -4);
+    assert.equal(c.players[2].life, 20);
+    c.reset();
+    c.reset();
+    assert.deepEqual(
+        c.players.map((p) => p.life),
+        [40, 20, 20, 20],
+    );
+    c.randomPlayer();
+    assert.match(c.result, /Jogador 1/);
+    c.undo();
+    assert.equal(c.players[1].life, 16);
+});
+test("Archenemy Commander shares only allied life, not poison or damage records", () => {
+    const c = table("archenemy_commander");
+    c.damage(2, 0, 0, 5);
+    assert.deepEqual(
+        c.players.map((p) => p.life),
+        [60, 55, 55, 55],
+    );
+    assert.equal(c.players[1].commander[0][0], 0);
+    c.change(2, 10, "poison");
+    assert.equal(c.players[1].poison, 0);
+    assert.match(c.warning(c.players[2]), /10/);
+});
+test("team draft keeps all six life totals independent", () => {
+    const c = table("team_draft");
+    c.change(0, -4);
+    assert.deepEqual(
+        c.players.map((p) => p.life),
+        [16, 20, 20, 20, 20, 20],
+    );
+    assert.match(c.playerRole(3), /Equipe B.*duelo 1/);
+});
+test("invalid team sizes and unsupported format cannot replace the table", () => {
+    const c = counter();
+    c.draftFormat = "two_headed";
+    c.choosePreset();
+    c.draftCount = 3;
+    c.pendingStart = true;
+    c.start();
+    assert.equal(c.format, "standard");
+    c.draftFormat = "missing";
+    c.start();
+    assert.equal(c.format, "standard");
+});
+test("Brawl and Oathbreaker never apply Commander damage loss", () => {
+    for (const format of ["brawl", "brawl_multi", "oathbreaker"]) {
+        const c = table(format);
+        c.damage(0, 1, 0, 21);
+        assert.equal(c.players[0].life, presets[format].life);
+        assert.equal(c.warning(c.players[0]), "");
+    }
+});
+test("planar die has one planeswalk, one chaos and four blank faces", () => {
+    const c = table("planechase");
+    const results = [];
+    for (let face = 0; face < 6; face++) {
+        c.roll = () => face;
+        c.planarDie();
+        results.push(c.result);
+    }
+    assert.equal(results.filter((r) => r.includes("Planeswalk")).length, 1);
+    assert.equal(results.filter((r) => r.includes("Caos")).length, 1);
+    assert.equal(results.filter((r) => r.includes("em branco")).length, 4);
+});
 beforeEach(() => {
     saved = null;
     globalThis.localStorage = {

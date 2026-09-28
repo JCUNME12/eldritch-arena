@@ -14,6 +14,10 @@
 <button class="arena-btn-secondary" @click="fullscreen()">Tela cheia</button>
 </div>
 </header>
+ <div class="arena-card p-4 mb-4 text-sm text-slate-300" x-show="presets[format].description">
+ <p x-text="'Referência do formato: '+presets[format].description"></p>
+ <p class="mt-2" x-show="initial!==presets[format].life" x-text="'Pontos iniciais personalizados nesta mesa: '+initial+(presets[format].leaderLife ? ' por aliado; arqui-inimigo: '+presets[format].leaderLife : '')"></p>
+ </div>
  <p x-show="storageError" x-cloak class="p-3 text-amber-200">Não foi possível restaurar ou salvar a mesa neste navegador.</p>
  <div class="players-grid" :class="'players-'+players.length">
  <template x-for="(player,index) in players" :key="player.id">
@@ -25,6 +29,7 @@
 <input class="player-name" :aria-label="'Nome do jogador '+(index+1)" :value="player.name" maxlength="30" @change="updatePlayer(index,'name',$event.target.value);$el.value=player.name">
 <button class="counter-small" @click="active=index" :aria-label="'Configurar '+player.name">•••</button>
 </div>
+ <p class="mt-3 text-center text-xs" x-text="playerRole(index)"></p>
  <div class="life-controls">
 <button @click="change(index,-step)" :aria-label="'Diminuir vida de '+player.name">−</button>
 <output class="life-total" x-text="player.life" :aria-label="'Vida de '+player.name" aria-live="polite">
@@ -44,7 +49,7 @@
 </span>
 <span x-text="'Energia '+player.energy">
 </span>
-<span x-show="format==='commander'" x-text="'Experiência '+player.experience">
+<span x-show="presets[format].commanderDamage" x-text="'Experiência '+player.experience">
 </span>
 </div>
  <p class="mt-2 text-center text-sm font-bold text-amber-100" x-text="warning(player)">
@@ -80,6 +85,7 @@
 <button class="arena-btn-secondary" @click="dice(n)" x-text="'D'+n">
 </button>
 </template>
+<button x-show="presets[format].planar" class="arena-btn-secondary" @click="planarDie()">Dado planar</button>
 <button class="arena-btn-secondary" @click="coin()">Moeda</button>
 <button class="arena-btn" @click="randomPlayer()">Sortear jogador</button>
 </div>
@@ -97,15 +103,16 @@
 </template>
 </select>
 </label>
+<p class="mt-4 text-sm text-slate-300" x-text="presets[draftFormat].description"></p>
 <div class="grid grid-cols-2 gap-4 mt-4">
-<label class="arena-label">Jogadores<select class="arena-input mt-2" x-model.number="draftCount">
-<template x-for="n in 6">
+<label class="arena-label">Jogadores<select class="arena-input mt-2" x-model.number="draftCount" :disabled="!!presets[draftFormat].fixedCount" @change="pendingStart=false">
+<template x-for="n in availableCounts()">
 <option :value="n" :selected="n===draftCount" x-text="n">
 </option>
 </template>
 </select>
 </label>
-<label class="arena-label">Vida inicial<input class="arena-input mt-2" type="number" min="1" max="99999" x-model.number="draftLife">
+<label class="arena-label"><span x-text="presets[draftFormat].leaderLife ? 'Vida de cada aliado' : ['two_headed','archenemy_shared'].includes(presets[draftFormat].layout) ? 'Vida por equipe' : 'Vida inicial'"></span><input class="arena-input mt-2" type="number" min="1" max="99999" x-model.number="draftLife" @input="pendingStart=false">
 </label>
 </div>
 <p class="mt-4 text-sm text-slate-400">Os presets definem pontos iniciais. A mesa não valida decks nem substitui as regras do jogo.</p>
@@ -152,9 +159,9 @@
 </template>
 </div>
 </template>
- <div x-show="format==='commander'" class="mt-5">
+ <div x-show="presets[format].commanderDamage" class="mt-5">
 <h3 class="font-bold">Dano de comandante recebido</h3>
-<p class="text-sm text-slate-400 my-2">Cada comandante é contado separadamente. O dano também reduz a vida. C1 e C2 permitem parceiros.</p>
+<p class="text-sm text-slate-400 my-2">Registre somente dano de combate. Cada comandante é contado separadamente por jogador. O dano também reduz a vida, inclusive a compartilhada. C1 e C2 permitem parceiros.</p>
 <template x-for="(source,i) in players">
 <div>
 <template x-for="slot in [0,1]">
