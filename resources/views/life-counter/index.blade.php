@@ -93,12 +93,23 @@
 </p>
 </section>
  <div x-show="settings" x-cloak class="table-overlay" @click.self="settings=false">
-<section role="dialog" aria-modal="true" aria-label="Nova mesa" class="table-dialog" @keydown.tab="trapFocus($event)" x-effect="if(settings) $nextTick(() => $el.querySelector('select').focus())">
+<section role="dialog" aria-modal="true" aria-label="Nova mesa" class="table-dialog" @keydown.tab="trapFocus($event)" x-effect="if(settings) { const step=setupStep; $nextTick(() => $el.querySelector(step==='game' ? '[data-game-choice]' : 'select').focus()) }">
 <h2 class="text-2xl font-bold">Prepare sua mesa</h2>
-<p class="text-slate-400 mt-2">Escolha o formato e ajuste as regras da sua partida.</p>
+<div x-show="setupStep==='game'">
+<p class="text-slate-400 mt-2">1 de 2 · Qual jogo vocês vão jogar?</p>
+<div class="grid gap-3 mt-5">
+<button data-game-choice class="arena-btn-secondary p-5 text-left" @click="chooseGame('magic')">Magic: The Gathering</button>
+<button class="arena-btn-secondary p-5 text-left" @click="chooseGame('ygo')">Yu-Gi-Oh!</button>
+</div>
+<button class="mt-5 text-sm text-slate-400 underline" @click="chooseGame('custom')">Criar uma mesa personalizada</button>
+<div class="mt-6"><button class="arena-btn-secondary" @click="settings=false">Cancelar</button></div>
+</div>
+<div x-show="setupStep==='format'">
+<p class="text-slate-400 mt-2" x-text="'2 de 2 · '+({magic:'Magic: The Gathering',ygo:'Yu-Gi-Oh!',custom:'Mesa personalizada'}[draftGame])"></p>
+<button class="mt-3 text-sm underline" @click="setupStep='game';pendingStart=false">Trocar jogo</button>
 <label class="arena-label block mt-5">Formato<select class="arena-input mt-2" x-model="draftFormat" @change="choosePreset()">
-<template x-for="(preset,id) in presets">
-<option :value="id" x-text="preset.name">
+<template x-for="(preset,id) in availablePresets()" :key="id">
+<option :value="id" :selected="id===draftFormat" x-text="preset.name.replace(/^Magic · |^Yu-Gi-Oh! · /,'')">
 </option>
 </template>
 </select>
@@ -121,6 +132,7 @@
 <button class="arena-btn" @click="start()" x-text="pendingStart ? 'Confirmar nova partida' : 'Iniciar mesa'">
 </button>
 <button class="arena-btn-secondary" @click="settings=false">Voltar</button>
+</div>
 </div>
 </section>
 </div>

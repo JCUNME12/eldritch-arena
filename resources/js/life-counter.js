@@ -274,6 +274,8 @@ export default function lifeCounter() {
         colors,
         format: "standard",
         draftFormat: "standard",
+        draftGame: "magic",
+        setupStep: "game",
         draftCount: 2,
         draftLife: 20,
         players: newPlayers(2, 20),
@@ -509,10 +511,42 @@ export default function lifeCounter() {
         },
         openSettings() {
             this.draftFormat = this.format;
+            this.draftGame =
+                this.format === "custom"
+                    ? "custom"
+                    : ["ygo", "speed"].includes(this.format)
+                      ? "ygo"
+                      : "magic";
+            this.setupStep = "game";
             this.draftCount = this.players.length;
             this.draftLife = this.initial;
             this.pendingStart = false;
             this.settings = true;
+        },
+        chooseGame(game) {
+            if (!["magic", "ygo", "custom"].includes(game)) return;
+            if (game !== this.draftGame) {
+                this.draftFormat = {
+                    magic: "standard",
+                    ygo: "ygo",
+                    custom: "custom",
+                }[game];
+                this.choosePreset();
+            }
+            this.draftGame = game;
+            this.pendingStart = false;
+            this.setupStep = "format";
+        },
+        availablePresets() {
+            return Object.fromEntries(
+                Object.entries(presets).filter(([id]) =>
+                    this.draftGame === "custom"
+                        ? id === "custom"
+                        : this.draftGame === "ygo"
+                          ? ["ygo", "speed"].includes(id)
+                          : !["ygo", "speed", "custom"].includes(id),
+                ),
+            );
         },
         choosePreset() {
             const p = presets[this.draftFormat];

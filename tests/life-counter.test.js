@@ -2,6 +2,29 @@ import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import counter, { newPlayers, presets } from "../resources/js/life-counter.js";
 let saved;
+test('game selection filters formats and resets incompatible defaults without changing the active table', () => {
+    const c = table('commander'); c.openSettings();
+    assert.equal(c.setupStep, 'game');
+    c.chooseGame('ygo');
+    assert.deepEqual(Object.keys(c.availablePresets()), ['ygo', 'speed']);
+    assert.equal(c.draftLife, 8000);
+    assert.equal(c.format, 'commander');
+    c.chooseGame('magic');
+    assert.ok(!Object.hasOwn(c.availablePresets(), 'ygo'));
+    assert.equal(c.draftLife, 20);
+    c.chooseGame('custom');
+    assert.deepEqual(Object.keys(c.availablePresets()), ['custom']);
+});
+test('reopening a saved Yu-Gi-Oh table preserves its chosen format and points', () => {
+    const c = table('speed'); c.openSettings(); c.chooseGame('ygo');
+    assert.equal(c.draftFormat, 'speed'); assert.equal(c.draftLife, 4000);
+});
+test('coin and player draw use both possible faces and select a valid player', () => {
+    const c = counter();
+    c.roll = () => 0; c.coin(); assert.equal(c.result, 'Coroa');
+    c.roll = () => 1; c.coin(); assert.equal(c.result, 'Cara');
+    c.randomPlayer(); assert.equal(c.result, 'Começa: Jogador 2');
+});
 function table(format) {
     const c = counter();
     c.draftFormat = format;
