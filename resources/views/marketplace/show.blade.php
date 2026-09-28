@@ -1,5 +1,5 @@
 <x-layouts.app title="{{ $card->name }} — Marketplace">
-    @if(auth()->id()===$card->user_id)<div class="flex gap-3 mb-5"><a class="arena-btn" href="{{ route('marketplace.edit',$card) }}">Editar anúncio</a><form method="POST" action="{{ route('marketplace.destroy',$card) }}" onsubmit="return confirm('Remover este anúncio?')">@csrf @method('DELETE')<button class="arena-btn-secondary">Remover anúncio</button></form></div>@endif
+    @if(auth()->id()===$card->user_id)<div class="flex gap-3 mb-5">@if($card->inventory_item_id)<a class="arena-btn" href="{{ route('store.show',$card->inventory_item_id) }}">Gerenciar no estoque</a>@else<a class="arena-btn" href="{{ route('marketplace.edit',$card) }}">Editar anúncio</a><form method="POST" action="{{ route('marketplace.destroy',$card) }}" onsubmit="return confirm('Remover este anúncio?')">@csrf @method('DELETE')<button class="arena-btn-secondary">Remover anúncio</button></form>@endif</div>@endif
     <div class="mb-5">
         <a href="{{ route('marketplace') }}" class="arena-btn-secondary">Voltar ao marketplace</a>
     </div>
@@ -24,6 +24,7 @@
             </div>
 
             <h1 class="arena-section-title mt-4">{{ $card->name }}</h1>
+            @if($card->inventoryItem)<p class="mt-3 text-sm text-slate-300">{{ $card->inventoryItem->published && !$card->inventoryItem->archived && $card->inventoryItem->quantity>0 ? $card->inventoryItem->quantity.' unidades disponíveis · confirme com a loja' : 'Anúncio indisponível para compradores' }}</p>@endif
             <p class="mt-3 text-slate-400">{{ $card->rarity }} • {{ $card->condition }}@if($card->edition) • {{ $card->edition }}@endif</p>
 
             <div class="mt-6 rounded-3xl border border-white/10 bg-white/5 p-5">

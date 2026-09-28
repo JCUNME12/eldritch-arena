@@ -27,7 +27,7 @@ class DashboardController extends Controller
         return view('dashboard.player', [
             'tournaments' => Tournament::withCount('registrations')->whereNull('cancelled_at')->where('starts_at', '>', now())->orderBy('starts_at')->take(3)->get(),
             'myEvents' => Tournament::whereHas('registrations', fn ($q) => $q->where('user_id', $user->id))->orderByDesc('starts_at')->take(5)->get(),
-            'cards' => CardListing::where('highlighted', true)->take(3)->get(),
+            'cards' => CardListing::available()->where('highlighted', true)->take(3)->get(),
         ]);
     }
 }

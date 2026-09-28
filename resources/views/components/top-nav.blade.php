@@ -6,6 +6,8 @@
 </span>
 </a>
 <div class="hidden lg:flex items-center gap-1">@auth
+@if(auth()->user()->canManageStore())<a class="nav-link" href="{{ route('store.index') }}">Minha loja</a>@endif
+@if(auth()->user()->isAdmin())<a class="nav-link" href="{{ route('admin') }}">Admin</a>@endif
 @foreach(['dashboard'=>'Meu painel','tournaments.index'=>'Torneios','marketplace'=>'Cartas','community'=>'Comunidade','life-counter'=>'Mesa de jogo'] as $route=>$label)<a class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}" href="{{ route($route) }}">{{ $label }}</a>
 @endforeach<form method="POST" action="{{ route('logout') }}">@csrf<button class="nav-link">Sair</button>
 </form>@else<a class="nav-link" href="{{ route('login') }}">Entrar</a>
@@ -13,6 +15,8 @@
 <button class="arena-btn-secondary lg:hidden" @click="open=!open" :aria-expanded="open" aria-controls="mobile-menu">Menu</button>
 </div>
 <div id="mobile-menu" class="border-t border-white/10 p-4 lg:hidden" x-show="open" x-cloak>@auth<div class="grid gap-2">
+@if(auth()->user()->canManageStore())<a class="nav-link" href="{{ route('store.index') }}">Minha loja</a>@endif
+@if(auth()->user()->isAdmin())<a class="nav-link" href="{{ route('admin') }}">Administração</a>@endif
 @foreach(['dashboard'=>'Meu painel','tournaments.index'=>'Torneios','marketplace'=>'Cartas','marketplace.create'=>'Anunciar carta','community'=>'Comunidade','life-counter'=>'Mesa de jogo','premium'=>'Arena Plus'] as $route=>$label)<a class="nav-link" href="{{ route($route) }}">{{ $label }}</a>
 @endforeach<form method="POST" action="{{ route('logout') }}">@csrf<button class="nav-link">Sair da conta</button>
 </form>

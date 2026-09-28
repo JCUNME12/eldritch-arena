@@ -16,6 +16,7 @@ class MarketplaceController extends Controller
         $game = $filters['game'] ?? null;
 
         $cards = CardListing::query()
+            ->available()
             ->when($game, fn ($query) => $query->where('game', $game))
             ->when($filters['q'] ?? null, fn ($q, $v) => $q->whereLike('name', '%'.$v.'%'))
             ->when($filters['mine'] ?? null, fn ($q) => $q->where('user_id', $request->user()->id))
@@ -72,6 +73,7 @@ class MarketplaceController extends Controller
     public function edit(Request $request, CardListing $cardListing): View
     {
         abort_unless($cardListing->user_id === $request->user()->id, 403);
+        abort_if($cardListing->inventory_item_id, 403, 'Edite este produto na área de estoque.');
 
         return view('marketplace.edit', ['card' => $cardListing]);
     }
@@ -79,6 +81,7 @@ class MarketplaceController extends Controller
     public function update(Request $request, CardListing $cardListing): RedirectResponse
     {
         abort_unless($cardListing->user_id === $request->user()->id, 403);
+        abort_if($cardListing->inventory_item_id, 403, 'Edite este produto na área de estoque.');
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'], 'price' => ['required', 'numeric', 'min:0', 'max:999999.99'],
             'description' => ['nullable', 'string', 'max:1000'], 'edition' => ['nullable', 'string', 'max:120'],
@@ -94,6 +97,7 @@ class MarketplaceController extends Controller
     public function destroy(Request $request, CardListing $cardListing): RedirectResponse
     {
         abort_unless($cardListing->user_id === $request->user()->id, 403);
+        abort_if($cardListing->inventory_item_id, 403, 'Pause o anúncio na área de estoque.');
         $cardListing->delete();
 
         return redirect()->route('marketplace')->with('status', 'Anúncio removido.');
@@ -101,6 +105,8 @@ class MarketplaceController extends Controller
 
     public function show(CardListing $cardListing): View
     {
+        abort_unless(CardListing::available()->whereKey($cardListing->id)->exists() || auth()->id() === $cardListing->user_id, 404);
+
         return view('marketplace.show', [
             'card' => $cardListing,
         ]);

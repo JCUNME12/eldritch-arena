@@ -38,4 +38,14 @@ class CardListing extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function inventoryItem(): BelongsTo
+    {
+        return $this->belongsTo(InventoryItem::class);
+    }
+
+    public function scopeAvailable($query)
+    {
+        return $query->where(fn ($q) => $q->whereNull('inventory_item_id')->orWhereHas('inventoryItem', fn ($i) => $i->where('published', true)->where('archived', false)->where('quantity', '>', 0)));
+    }
 }

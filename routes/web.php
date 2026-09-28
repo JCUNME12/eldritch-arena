@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CommunityController;
@@ -8,7 +9,10 @@ use App\Http\Controllers\LifeCounterController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProfileTypeController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TournamentController;
+use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureStoreAccess;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -23,6 +27,19 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::middleware(EnsureStoreAccess::class)->prefix('loja')->name('store.')->controller(StoreController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('/perfil', 'saveStore')->name('profile');
+        Route::get('/produtos/novo', 'create')->name('create');
+        Route::post('/produtos', 'saveItem')->name('save');
+        Route::get('/produtos/{item}', 'show')->name('show');
+        Route::get('/produtos/{item}/editar', 'edit')->name('edit');
+        Route::put('/produtos/{item}', 'update')->name('update');
+        Route::post('/produtos/{item}/movimentacoes', 'move')->name('move');
+        Route::patch('/produtos/{item}/publicacao', 'publish')->name('publish');
+        Route::patch('/produtos/{item}/arquivo', 'archive')->name('archive');
+    });
+    Route::get('/admin', AdminController::class)->middleware(EnsureAdmin::class)->name('admin');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::patch('/perfil/tipo', [ProfileTypeController::class, 'update'])->name('profile.type');
