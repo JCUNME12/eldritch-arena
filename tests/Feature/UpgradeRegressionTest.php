@@ -50,7 +50,7 @@ class UpgradeRegressionTest extends TestCase
     {
         $organizer = User::factory()->create(['type' => 'organizer']);
         $this->actingAs($organizer)->post('/torneios', [
-            'title' => 'Upgrade Cup', 'game' => 'Magic', 'starts_at' => '2027-01-10 18:00:00',
+            'title' => 'Upgrade Cup', 'game' => 'Magic', 'format' => 'Standard', 'starts_at' => '2027-01-10 18:00:00',
             'prize' => 'Cards', 'entry_fee' => 10, 'slots' => 16, 'location' => 'Arena',
         ])->assertSessionHasNoErrors()->assertRedirect();
         $tournament = Tournament::sole();

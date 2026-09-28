@@ -14,6 +14,14 @@ class PremiumController extends Controller
         return view('premium.index');
     }
 
+    public function cancel(Request $request): RedirectResponse
+    {
+        $request->user()->update(['premium_active' => false, 'premium_plan' => 'free', 'premium_started_at' => null]);
+        $request->user()->cardListings()->update(['highlighted' => false]);
+
+        return back()->with('status', 'Acesso Plus desativado.');
+    }
+
     public function subscribe(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -28,6 +36,6 @@ class PremiumController extends Controller
 
         return redirect()
             ->route('premium')
-            ->with('status', 'Assinatura premium simulada ativada com sucesso para demonstração do TCC.');
+            ->with('status', 'Acesso antecipado Plus ativado gratuitamente. Seus próximos anúncios receberão destaque.');
     }
 }

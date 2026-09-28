@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            throw new \RuntimeException('Dados de exemplo são permitidos apenas em ambiente local ou de testes.');
+        }
         $player = User::updateOrCreate(
             ['email' => 'jogador@eldritch.test'],
             [
@@ -43,9 +46,9 @@ class DatabaseSeeder extends Seeder
         );
 
         $tournaments = [
-            ['title' => 'Noite Commander Eldritch', 'game' => 'Magic: The Gathering', 'starts_at' => now()->addDays(3)->setTime(19, 30), 'prize' => 'Boosters + playmat exclusivo', 'entry_fee' => 35, 'slots' => 32, 'location' => 'Arcana Store - Centro', 'highlighted' => true],
-            ['title' => 'Liga Pokémon Brasil', 'game' => 'Pokémon', 'starts_at' => now()->addDays(6)->setTime(14, 0), 'prize' => 'Kit treinador + créditos na loja', 'entry_fee' => 25, 'slots' => 24, 'location' => 'Arena Eldritch', 'highlighted' => true],
-            ['title' => 'Duelo Yu-Gi-Oh! Neon Cup', 'game' => 'Yu-Gi-Oh!', 'starts_at' => now()->addDays(10)->setTime(16, 0), 'prize' => 'Deck box premium + R$ 300', 'entry_fee' => 30, 'slots' => 40, 'location' => 'Shopping Card Hall', 'highlighted' => false],
+            ['title' => 'Noite Commander Eldritch', 'game' => 'Magic: The Gathering', 'format' => 'Commander', 'starts_at' => now()->addDays(3)->setTime(19, 30), 'prize' => 'Boosters + playmat exclusivo', 'entry_fee' => 35, 'slots' => 32, 'location' => 'Arcana Store - Centro', 'highlighted' => true],
+            ['title' => 'Liga Pokémon Brasil', 'game' => 'Pokémon', 'format' => 'Standard', 'starts_at' => now()->addDays(6)->setTime(14, 0), 'prize' => 'Kit treinador + créditos na loja', 'entry_fee' => 25, 'slots' => 24, 'location' => 'Arena Eldritch', 'highlighted' => true],
+            ['title' => 'Duelo Yu-Gi-Oh! Neon Cup', 'game' => 'Yu-Gi-Oh!', 'format' => 'Advanced', 'starts_at' => now()->addDays(10)->setTime(16, 0), 'prize' => 'Deck box premium + R$ 300', 'entry_fee' => 30, 'slots' => 40, 'location' => 'Shopping Card Hall', 'highlighted' => false],
         ];
 
         foreach ($tournaments as $data) {
@@ -86,7 +89,7 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $organizer->id,
                 'title' => 'Bem-vindos à comunidade Eldritch Arena',
                 'category' => 'Avisos',
-                'body' => 'Este espaço foi criado para centralizar conversas entre players, lojistas e organizadores. Use os tópicos para tirar dúvidas, divulgar eventos, discutir decks, combinar partidas, melhorar listas competitivas e demonstrar para a banca como a comunidade funciona dentro do sistema.',
+                'body' => 'Este espaço foi criado para centralizar conversas entre players, lojistas e organizadores. Use os tópicos para tirar dúvidas, divulgar eventos, discutir decks, combinar partidas, melhorar listas competitivas e encontrar novos parceiros de jogo.',
                 'is_pinned' => true,
                 'comments' => [
                     ['user_id' => $player->id, 'body' => 'Ficou muito bom ter uma área própria para conversar sobre torneios e marketplace. Ajuda a mostrar o lado social do projeto.'],
@@ -113,7 +116,7 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $organizer->id,
                 'title' => 'Dicas para comprar cartas com segurança no marketplace',
                 'category' => 'Marketplace',
-                'body' => 'Confiram sempre o estado da carta, a reputação do vendedor, o contato informado e, quando possível, negociem em eventos ou lojas parceiras. Para o TCC, essa discussão demonstra como marketplace e comunidade se conectam dentro do Eldritch Arena.',
+                'body' => 'Confiram sempre o estado da carta, a reputação do vendedor, o contato informado e, quando possível, negociem em eventos ou lojas parceiras. Combine os detalhes da negociação diretamente com o vendedor.',
                 'is_pinned' => false,
                 'comments' => [
                     ['user_id' => $player->id, 'body' => 'Boa dica. Também acho importante pedir foto da carta antes de fechar negócio.'],

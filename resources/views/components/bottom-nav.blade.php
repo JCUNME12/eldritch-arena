@@ -1,10 +1,8 @@
-<nav class="fixed bottom-3 left-3 right-3 z-30 rounded-3xl border border-white/10 bg-black/70 p-2 shadow-neon backdrop-blur-xl md:hidden">
-    <div class="flex gap-1 overflow-x-auto pb-1">
-        <a href="{{ route('dashboard') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('dashboard') ? 'bottom-nav-link-active' : '' }}"><span>🏰</span><span>Início</span></a>
-        <a href="{{ route('tournaments.index') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('tournaments.*') ? 'bottom-nav-link-active' : '' }}"><span>🏆</span><span>Torneios</span></a>
-        <a href="{{ route('marketplace') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('marketplace') || request()->routeIs('marketplace.*') ? 'bottom-nav-link-active' : '' }}"><span>🃏</span><span>Cartas</span></a>
-        <a href="{{ route('community') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('community') ? 'bottom-nav-link-active' : '' }}"><span>👥</span><span>Comunidade</span></a>
-        <a href="{{ route('premium') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('premium') ? 'bottom-nav-link-active' : '' }}"><span>⭐</span><span>Premium</span></a>
-        <a href="{{ route('life-counter') }}" class="bottom-nav-link min-w-20 {{ request()->routeIs('life-counter') ? 'bottom-nav-link-active' : '' }}"><span>❤️</span><span>Vida</span></a>
-    </div>
+<nav class="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-arena-black px-2 pb-2 lg:hidden" aria-label="Atalhos">
+<div class="grid grid-cols-5">
+@foreach(['dashboard'=>['⌂','Painel'],'tournaments.index'=>['◇','Torneios'],'life-counter'=>['＋','Mesa'],'marketplace'=>['▤','Cartas'],'community'=>['◎','Comunidade']] as $route=>$item)<a href="{{ route($route) }}" class="bottom-nav-link {{ request()->routeIs($route) ? 'bottom-nav-link-active' : '' }}">
+<span class="text-xl" aria-hidden="true">{{ $item[0] }}</span>
+<span>{{ $item[1] }}</span>
+</a>
+@endforeach</div>
 </nav>

@@ -1,8 +1,177 @@
-<x-layouts.app title="Contador de Vida — Eldritch Arena">
-    <div x-data="lifeCounter()" class="mx-auto max-w-5xl">
-        <div class="mb-6 text-center"><p class="font-bold text-arena-cyan">Funcionalidade de destaque</p><h1 class="arena-section-title">❤️ Contador de Vida</h1><p class="mt-2 text-slate-400">Interface grande, responsiva e touch-friendly para demonstração ao vivo.</p></div>
-        <div class="arena-card mb-5 flex flex-col items-center justify-between gap-3 p-4 md:flex-row"><div class="flex gap-2"><button @click="setGame('MTG')" :class="game==='MTG' ? 'arena-btn' : 'arena-btn-secondary'">MTG: 20</button><button @click="setGame('YGO')" :class="game==='YGO' ? 'arena-btn' : 'arena-btn-secondary'">Yu-Gi-Oh: 8000</button></div><button @click="reset()" class="arena-btn-secondary">Resetar duelo</button></div>
-        <div class="grid gap-5 md:grid-cols-2"><template x-for="player in [1,2]" :key="player"><section class="arena-card p-5 text-center"><p class="text-sm font-bold text-arena-cyan" x-text="`Jogador ${player}`"></p><div class="my-6 font-display text-7xl font-black transition md:text-8xl" :class="life[player] <= 5 && game==='MTG' ? 'text-red-400' : 'text-white'" x-text="life[player]"></div><div class="grid grid-cols-2 gap-3"><button @click="change(player, 1)" class="arena-btn text-xl">+1</button><button @click="change(player, -1)" class="arena-btn-secondary text-xl">-1</button><button @click="change(player, 5)" class="arena-btn text-xl">+5</button><button @click="change(player, -5)" class="arena-btn-secondary text-xl">-5</button></div></section></template></div>
-    </div>
-    <script>function lifeCounter(){return{game:'MTG',initial:20,life:{1:20,2:20},setGame(g){this.game=g;this.initial=g==='YGO'?8000:20;this.reset()},change(p,v){this.life[p]=Math.max(0,this.life[p]+v)},reset(){this.life={1:this.initial,2:this.initial}}}}</script>
+<x-layouts.app title="Mesa de jogo — Eldritch Arena">
+<div x-data="lifeCounter" class="game-table" @keydown.escape.window="settings=false;tools=false;historyOpen=false;active=null">
+ <header class="table-toolbar">
+<div>
+<p class="eyebrow">COMPANHEIRO DE MESA</p>
+<h1 class="text-2xl font-bold">Marcador de vida</h1>
+<p class="text-sm text-slate-400" x-text="presets[format].name">
+</p>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="arena-btn-secondary" @click="openSettings()">Nova mesa</button>
+<button class="arena-btn-secondary" @click="undo()" :disabled="!history.length">Desfazer</button>
+<button class="arena-btn-secondary" @click="tools=!tools">Dados e moeda</button>
+<button class="arena-btn-secondary" @click="fullscreen()">Tela cheia</button>
+</div>
+</header>
+ <p x-show="storageError" x-cloak class="p-3 text-amber-200">Não foi possível restaurar ou salvar a mesa neste navegador.</p>
+ <div class="players-grid" :class="'players-'+players.length">
+ <template x-for="(player,index) in players" :key="player.id">
+<section class="player-zone" :style="{'--player-color':player.color,'--digits':Math.max(2,String(player.life).length)}" :class="{'player-rotated':player.rotated}">
+ <div class="player-content">
+<div class="flex items-center justify-between gap-2">
+<span class="player-number" x-text="String(index+1).padStart(2,'0')">
+</span>
+<input class="player-name" :aria-label="'Nome do jogador '+(index+1)" x-model="player.name" maxlength="30" @change="save()">
+<button class="counter-small" @click="active=index" :aria-label="'Configurar '+player.name">•••</button>
+</div>
+ <div class="life-controls">
+<button @click="change(index,-step)" :aria-label="'Diminuir vida de '+player.name">−</button>
+<output class="life-total" x-text="player.life" :aria-label="'Vida de '+player.name" aria-live="polite">
+</output>
+<button @click="change(index,step)" :aria-label="'Aumentar vida de '+player.name">+</button>
+</div>
+ <div class="flex justify-center gap-3">
+<button class="counter-small" @click="change(index,-step*5)" x-text="'−'+step*5">
+</button>
+<span class="self-center text-xs opacity-70" x-text="'PASSO '+step">
+</span>
+<button class="counter-small" @click="change(index,step*5)" x-text="'+'+step*5">
+</button>
+</div>
+ <div class="mt-3 flex justify-center gap-4 text-sm" x-show="presets[format].magic">
+<span x-text="'Veneno '+player.poison">
+</span>
+<span x-text="'Energia '+player.energy">
+</span>
+<span x-show="format==='commander'" x-text="'Experiência '+player.experience">
+</span>
+</div>
+ <p class="mt-2 text-center text-sm font-bold text-amber-100" x-text="warning(player)">
+</p>
+</div>
+</section>
+</template>
+ </div>
+ <footer class="table-footer">
+<span>Salvo neste navegador · funciona sem conexão após abrir a mesa</span>
+<div class="flex gap-4">
+<button @click="historyOpen=!historyOpen">Histórico</button>
+<button @click="reset()" x-text="pendingReset ? 'Confirmar reinício' : 'Reiniciar pontos'">
+</button>
+<button x-show="pendingReset" @click="pendingReset=false">Manter partida</button>
+</div>
+</footer>
+ <section x-show="historyOpen" x-cloak class="arena-card p-5 mt-3">
+<h2 class="font-bold">Últimas ações desta sessão</h2>
+<p x-show="!history.length" class="text-slate-400">Nenhuma alteração ainda.</p>
+<template x-for="(entry,i) in history" :key="i">
+<p class="py-2 border-b border-white/10 text-sm" x-text="entry.label">
+</p>
+</template>
+</section>
+ <section x-show="tools" x-cloak class="arena-card p-5 mt-3">
+<div class="flex justify-between">
+<h2 class="font-bold">Sorteio da mesa</h2>
+<button @click="tools=false">Fechar</button>
+</div>
+<div class="flex flex-wrap gap-2 mt-4">
+<template x-for="n in [4,6,8,10,12,20]">
+<button class="arena-btn-secondary" @click="dice(n)" x-text="'D'+n">
+</button>
+</template>
+<button class="arena-btn-secondary" @click="coin()">Moeda</button>
+<button class="arena-btn" @click="randomPlayer()">Sortear jogador</button>
+</div>
+<p class="text-3xl font-bold mt-4" aria-live="polite" x-text="result">
+</p>
+</section>
+ <div x-show="settings" x-cloak class="table-overlay" @click.self="settings=false">
+<section role="dialog" aria-modal="true" aria-label="Nova mesa" class="table-dialog" @keydown.tab="trapFocus($event)" x-effect="if(settings) $nextTick(() => $el.querySelector('select').focus())">
+<h2 class="text-2xl font-bold">Prepare sua mesa</h2>
+<p class="text-slate-400 mt-2">Escolha o formato e ajuste as regras da sua partida.</p>
+<label class="arena-label block mt-5">Formato<select class="arena-input mt-2" x-model="draftFormat" @change="choosePreset()">
+<template x-for="(preset,id) in presets">
+<option :value="id" x-text="preset.name">
+</option>
+</template>
+</select>
+</label>
+<div class="grid grid-cols-2 gap-4 mt-4">
+<label class="arena-label">Jogadores<select class="arena-input mt-2" x-model.number="draftCount">
+<template x-for="n in 6">
+<option :value="n" :selected="n===draftCount" x-text="n">
+</option>
+</template>
+</select>
+</label>
+<label class="arena-label">Vida inicial<input class="arena-input mt-2" type="number" min="1" max="99999" x-model.number="draftLife">
+</label>
+</div>
+<p class="mt-4 text-sm text-slate-400">Os presets definem pontos iniciais. A mesa não valida decks nem substitui as regras do jogo.</p>
+<p x-show="pendingStart" role="alert" class="mt-4 text-amber-200">A partida atual será substituída. Confirme para continuar.</p>
+<div class="flex gap-3 mt-6">
+<button class="arena-btn" @click="start()" x-text="pendingStart ? 'Confirmar nova partida' : 'Iniciar mesa'">
+</button>
+<button class="arena-btn-secondary" @click="settings=false">Voltar</button>
+</div>
+</section>
+</div>
+ <template x-if="active!==null">
+<div class="table-overlay" @click.self="active=null">
+<section class="table-dialog" role="dialog" aria-modal="true" aria-label="Marcadores do jogador" @keydown.tab="trapFocus($event)" x-init="$nextTick(() => $el.querySelector('button').focus())">
+<div class="flex justify-between gap-3">
+<h2 class="text-2xl font-bold" x-text="players[active].name">
+</h2>
+<button class="arena-btn-secondary" @click="active=null">Fechar</button>
+</div>
+<div class="flex flex-wrap gap-2 my-4">
+<template x-for="color in colors">
+<button class="color-choice" :style="{background:color}" :aria-label="'Usar cor '+color" @click="players[active].color=color;save()">
+</button>
+</template>
+<button class="arena-btn-secondary" @click="players[active].rotated=!players[active].rotated;save()">Girar 180°</button>
+</div>
+ <label class="arena-label">Ajuste de vida<input type="number" min="1" max="99999" x-model.number="customAmount" class="arena-input my-2">
+</label>
+<div class="flex gap-2">
+<button class="arena-btn-secondary" @click="change(active,-Math.abs(customAmount))">Subtrair</button>
+<button class="arena-btn-secondary" @click="change(active,Math.abs(customAmount))">Adicionar</button>
+</div>
+ <template x-if="presets[format].magic">
+<div class="mt-5">
+<template x-for="[field,label] in [['poison','Veneno'],['energy','Energia'],['experience','Experiência']]">
+<div class="marker-row">
+<span x-text="label">
+</span>
+<button class="counter-small" @click="change(active,-1,field)" :aria-label="'Diminuir '+label">−</button>
+<output x-text="players[active][field]">
+</output>
+<button class="counter-small" @click="change(active,1,field)" :aria-label="'Aumentar '+label">+</button>
+</div>
+</template>
+</div>
+</template>
+ <div x-show="format==='commander'" class="mt-5">
+<h3 class="font-bold">Dano de comandante recebido</h3>
+<p class="text-sm text-slate-400 my-2">Cada comandante é contado separadamente. O dano também reduz a vida. C1 e C2 permitem parceiros.</p>
+<template x-for="(source,i) in players">
+<div>
+<template x-for="slot in [0,1]">
+<div class="marker-row">
+<span class="text-sm" x-text="source.name+' · C'+(slot+1)">
+</span>
+<button class="counter-small" @click="damage(active,i,slot,-1)" aria-label="Remover dano de comandante">−</button>
+<output x-text="players[active].commander[i][slot]">
+</output>
+<button class="counter-small" @click="damage(active,i,slot,1)" aria-label="Adicionar dano de comandante">+</button>
+</div>
+</template>
+</div>
+</template>
+</div>
+ </section>
+</div>
+</template>
+</div>
 </x-layouts.app>

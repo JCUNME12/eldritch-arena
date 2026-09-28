@@ -8,6 +8,7 @@ use App\Models\CommunityTopic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CommunityController extends Controller
@@ -22,13 +23,16 @@ class CommunityController extends Controller
         'clap' => '👏',
     ];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $topics = CommunityTopic::with(['user', 'comments', 'reactions'])
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100'], 'category' => ['nullable', Rule::in($this->categories)]]);
+        $topics = CommunityTopic::with(['user', 'reactions'])
+            ->when($filters['q'] ?? null, fn ($q, $v) => $q->whereLike('title', '%'.$v.'%'))
+            ->when($filters['category'] ?? null, fn ($q, $v) => $q->where('category', $v))
             ->withCount('comments')
             ->orderByDesc('is_pinned')
             ->latest()
-            ->get();
+            ->paginate(12)->withQueryString();
 
         $categories = $this->categories;
         $reactionTypes = $this->reactionTypes;
@@ -47,7 +51,7 @@ class CommunityController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:140'],
-            'category' => ['required', 'string', 'max:40'],
+            'category' => ['required', Rule::in($this->categories)],
             'body' => ['required', 'string', 'min:20', 'max:5000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
         ], [
@@ -99,7 +103,7 @@ class CommunityController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:140'],
-            'category' => ['required', 'string', 'max:40'],
+            'category' => ['required', Rule::in($this->categories)],
             'body' => ['required', 'string', 'min:20', 'max:5000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:4096'],
             'remove_image' => ['nullable', 'boolean'],
@@ -248,7 +252,7 @@ class CommunityController extends Controller
     public function react(Request $request, CommunityTopic $topic): RedirectResponse
     {
         $validated = $request->validate([
-            'type' => ['required', 'string', 'in:' . implode(',', array_keys($this->reactionTypes))],
+            'type' => ['required', 'string', 'in:'.implode(',', array_keys($this->reactionTypes))],
         ]);
 
         $reaction = CommunityReaction::where('community_topic_id', $topic->id)

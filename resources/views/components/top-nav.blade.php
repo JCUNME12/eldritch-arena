@@ -1,27 +1,23 @@
-<nav class="relative z-20 border-b border-white/10 bg-black/25 backdrop-blur-xl">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="{{ route('home') }}" class="flex items-center gap-3">
-            <div class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-arena-purple to-arena-cyan shadow-neon">⚔</div>
-            <div>
-                <p class="font-display text-lg font-black tracking-wide text-white">Eldritch Arena</p>
-                <p class="hidden text-xs font-semibold text-slate-400 sm:block">TCG hub Brasil</p>
-            </div>
-        </a>
-
-        <div class="hidden items-center gap-2 md:flex">
-            @auth
-                <a href="{{ route('dashboard') }}" class="arena-btn-secondary">Dashboard</a>
-                <a href="{{ route('tournaments.index') }}" class="arena-btn-secondary">Torneios</a>
-                <a href="{{ route('marketplace') }}" class="arena-btn-secondary">Marketplace</a>
-                <a href="{{ route('marketplace.create') }}" class="arena-btn-secondary">Vender Carta</a>
-                <a href="{{ route('community') }}" class="arena-btn-secondary">Comunidade</a>
-                <a href="{{ route('premium') }}" class="arena-btn-secondary">Premium</a>
-                <a href="{{ route('life-counter') }}" class="arena-btn">Contador</a>
-                <form method="POST" action="{{ route('logout') }}">@csrf<button class="arena-btn-secondary">Sair</button></form>
-            @else
-                <a href="{{ route('login') }}" class="arena-btn-secondary">Entrar</a>
-                <a href="{{ route('register') }}" class="arena-btn">Entrar na Arena</a>
-            @endauth
-        </div>
-    </div>
+<nav class="relative z-40 border-b border-white/10 bg-arena-black" x-data="{open:false}" aria-label="Navegação principal">
+<div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+<a href="{{ route('home') }}" class="flex items-center gap-3">
+<span class="brand-mark" aria-hidden="true">E</span>
+<span class="text-lg font-bold tracking-tight">Eldritch <span class="text-arena-gold">Arena</span>
+</span>
+</a>
+<div class="hidden lg:flex items-center gap-1">@auth
+@foreach(['dashboard'=>'Meu painel','tournaments.index'=>'Torneios','marketplace'=>'Cartas','community'=>'Comunidade','life-counter'=>'Mesa de jogo'] as $route=>$label)<a class="nav-link {{ request()->routeIs($route) ? 'active' : '' }}" href="{{ route($route) }}">{{ $label }}</a>
+@endforeach<form method="POST" action="{{ route('logout') }}">@csrf<button class="nav-link">Sair</button>
+</form>@else<a class="nav-link" href="{{ route('login') }}">Entrar</a>
+<a class="arena-btn" href="{{ route('register') }}">Criar conta</a>@endauth</div>
+<button class="arena-btn-secondary lg:hidden" @click="open=!open" :aria-expanded="open" aria-controls="mobile-menu">Menu</button>
+</div>
+<div id="mobile-menu" class="border-t border-white/10 p-4 lg:hidden" x-show="open" x-cloak>@auth<div class="grid gap-2">
+@foreach(['dashboard'=>'Meu painel','tournaments.index'=>'Torneios','marketplace'=>'Cartas','marketplace.create'=>'Anunciar carta','community'=>'Comunidade','life-counter'=>'Mesa de jogo','premium'=>'Arena Plus'] as $route=>$label)<a class="nav-link" href="{{ route($route) }}">{{ $label }}</a>
+@endforeach<form method="POST" action="{{ route('logout') }}">@csrf<button class="nav-link">Sair da conta</button>
+</form>
+</div>@else<div class="flex gap-3">
+<a class="arena-btn-secondary" href="{{ route('login') }}">Entrar</a>
+<a class="arena-btn" href="{{ route('register') }}">Criar conta</a>
+</div>@endauth</div>
 </nav>

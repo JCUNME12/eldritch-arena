@@ -1,58 +1,13 @@
-<x-layouts.app title="Premium — Eldritch Arena">
-    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-            <p class="font-bold text-arena-gold">Monetização simulada</p>
-            <h1 class="arena-section-title">Planos Premium</h1>
-            <p class="mt-2 max-w-3xl text-slate-400">Esta tela demonstra como o Eldritch Arena poderia monetizar o aplicativo com assinaturas para players competitivos e lojistas, sem processar pagamento real no protótipo.</p>
-        </div>
-        <div class="rounded-3xl border border-white/10 bg-white/5 px-5 py-4">
-            <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Seu plano</p>
-            <p class="text-xl font-black text-white">{{ auth()->user()->isPremium() ? 'Premium ativo' : 'Gratuito' }}</p>
-        </div>
-    </div>
-
-    <div class="mt-6 grid gap-5 lg:grid-cols-2">
-        <section class="arena-card p-6">
-            <p class="font-bold text-arena-cyan">Para jogadores</p>
-            <h2 class="mt-2 text-3xl font-black text-white">Player Premium</h2>
-            <p class="mt-3 text-slate-400">Ideal para jogadores que participam de torneios, querem acompanhar a comunidade e destacar seus anúncios pessoais no marketplace.</p>
-            <p class="mt-5 text-4xl font-black text-arena-gold">R$ 9,90 <span class="text-base text-slate-400">/ mês</span></p>
-
-            <div class="mt-5 grid gap-3 text-sm text-slate-300">
-                <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Anúncios pessoais com selo premium.</p>
-                <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Alertas e recomendações de torneios.</p>
-                <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Perfil de jogador com destaque na comunidade.</p>
-            </div>
-
-            <form method="POST" action="{{ route('premium.subscribe') }}" class="mt-6">
-                @csrf
-                <input type="hidden" name="plan" value="player_premium">
-                <button class="arena-btn w-full">Assinar Player Premium</button>
-            </form>
-        </section>
-
-        <section class="arena-card border-arena-gold/30 p-6">
-            <p class="font-bold text-arena-gold">Para lojistas</p>
-            <h2 class="mt-2 text-3xl font-black text-white">Loja Premium</h2>
-            <p class="mt-3 text-slate-400">Plano para lojas e organizadores que querem vitrine comercial, mais visibilidade e anúncios destacados no marketplace.</p>
-            <p class="mt-5 text-4xl font-black text-arena-gold">R$ 29,90 <span class="text-base text-slate-400">/ mês</span></p>
-
-            <div class="mt-5 grid gap-3 text-sm text-slate-300">
-                <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Vitrine de loja com selo verificado.</p>
-                <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Anúncios destacados automaticamente.</p>
-                <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Maior capacidade de divulgação de produtos e torneios.</p>
-            </div>
-
-            <form method="POST" action="{{ route('premium.subscribe') }}" class="mt-6">
-                @csrf
-                <input type="hidden" name="plan" value="loja_premium">
-                <button class="arena-btn w-full">Assinar Loja Premium</button>
-            </form>
-        </section>
-    </div>
-
-    <section class="arena-card mt-6 p-6">
-        <h2 class="text-2xl font-black text-white">Observação para a banca</h2>
-        <p class="mt-3 text-slate-400">O botão de assinatura não realiza cobrança real. Ele apenas ativa o estado premium do usuário no banco de dados para demonstrar o modelo de monetização, a diferenciação entre planos e o impacto visual no marketplace.</p>
-    </section>
+<x-layouts.app title="Arena Plus — Eldritch Arena">
+<section class="mx-auto max-w-3xl py-10">
+<p class="eyebrow">ARENA PLUS · ACESSO ANTECIPADO</p>
+<h1 class="arena-section-title">Mais destaque para suas cartas.</h1>
+<p class="text-slate-400 text-lg leading-8 mt-5">Experimente o destaque de anúncios da Arena. Durante o acesso antecipado, a ativação é gratuita e não exige cartão.</p>
+<div class="arena-card mt-8 p-6">
+<h2 class="text-2xl font-bold">{{ auth()->user()->isPremium() ? 'Seu acesso está ativo' : 'Conheça o destaque Plus' }}</h2>
+<p class="mt-3 text-slate-400">Novos anúncios recebem o selo Plus e prioridade na listagem padrão. Recursos adicionais e planos pagos ainda não estão disponíveis.</p>@if(auth()->user()->isPremium())<form class="mt-5" method="POST" action="{{ route('premium.cancel') }}">@csrf @method('DELETE')<button class="arena-btn-secondary">Desativar acesso Plus</button>
+</form>@else<form method="POST" action="{{ route('premium.subscribe') }}" class="mt-5">@csrf<input type="hidden" name="plan" value="{{ auth()->user()->isOrganizer() ? 'loja_premium' : 'player_premium' }}">
+<button class="arena-btn">Ativar acesso gratuito</button>
+</form>@endif</div>
+</section>
 </x-layouts.app>

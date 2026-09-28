@@ -27,3 +27,5 @@ cloudflared.exe
 
 /.local/
 /.env.testing
+
+/storage/logs/*.log

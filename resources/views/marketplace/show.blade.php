@@ -1,4 +1,5 @@
 <x-layouts.app title="{{ $card->name }} — Marketplace">
+    @if(auth()->id()===$card->user_id)<div class="flex gap-3 mb-5"><a class="arena-btn" href="{{ route('marketplace.edit',$card) }}">Editar anúncio</a><form method="POST" action="{{ route('marketplace.destroy',$card) }}" onsubmit="return confirm('Remover este anúncio?')">@csrf @method('DELETE')<button class="arena-btn-secondary">Remover anúncio</button></form></div>@endif
     <div class="mb-5">
         <a href="{{ route('marketplace') }}" class="arena-btn-secondary">Voltar ao marketplace</a>
     </div>
@@ -9,7 +10,7 @@
                 @if($card->image_url)
                     <img src="{{ $card->image_url }}" alt="{{ $card->name }}" class="h-full w-full object-cover">
                 @else
-                    <span class="text-8xl">🃏</span>
+                    <span class="font-display text-8xl text-arena-gold" aria-hidden="true">◇</span>
                 @endif
             </div>
         </section>
@@ -18,7 +19,7 @@
             <div class="flex flex-wrap items-center gap-2">
                 <span class="rounded-full border border-arena-cyan/40 bg-arena-cyan/10 px-3 py-1 text-sm font-bold text-arena-cyan">{{ $card->game }}</span>
                 @if($card->highlighted)
-                    <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-3 py-1 text-sm font-bold text-arena-gold">Anúncio premium</span>
+                    <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-3 py-1 text-sm font-bold text-arena-gold">Anúncio Plus</span>
                 @endif
             </div>
 
@@ -39,7 +40,7 @@
                 <div class="rounded-3xl border border-white/10 bg-black/20 p-5">
                     <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Contato</p>
                     <p class="mt-2 break-all text-sm font-bold text-arena-cyan">{{ $card->contact_email ?? 'Contato pelo marketplace' }}</p>
-                    <p class="mt-1 text-sm text-slate-400">Contato demonstrativo para o TCC.</p>
+                    <p class="mt-1 text-sm text-slate-400">Negocie diretamente com o vendedor. A Arena não processa pagamentos.</p>
                 </div>
             </div>
 

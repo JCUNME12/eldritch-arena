@@ -14,6 +14,7 @@
         </div>
     @endif
 
+    <form method="GET" class="mt-5 flex flex-wrap gap-3"><label class="flex-1"><span class="sr-only">Buscar discussão</span><input name="q" value="{{ request('q') }}" maxlength="100" class="arena-input" placeholder="Buscar uma discussão"></label><label><span class="sr-only">Categoria</span><select name="category" class="arena-input"><option value="">Todas as categorias</option>@foreach($categories as $category)<option @selected(request('category')===$category)>{{ $category }}</option>@endforeach</select></label><button class="arena-btn-secondary">Buscar</button></form>
     <div class="mt-6 grid gap-5 lg:grid-cols-[1.3fr_.7fr]">
         <section class="grid gap-4">
             @forelse($topics as $topic)
@@ -74,6 +75,7 @@
                     <a href="{{ route('community.create') }}" class="arena-btn mt-5 inline-flex">Criar primeiro tópico</a>
                 </div>
             @endforelse
+            {{ $topics->links() }}
         </section>
 
         <aside class="grid h-fit gap-4">
@@ -90,7 +92,7 @@
                 <div class="mt-4 grid gap-3 text-sm text-slate-300">
                     <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Crie tópicos para pedir ajuda com decks, divulgar eventos ou negociar cartas.</p>
                     <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Anexe imagens para mostrar cartas, prints de decklists ou registros de torneios.</p>
-                    <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Reaja com joinha, coração, fogo, ideia ou aplauso para simular engajamento real.</p>
+                    <p class="rounded-2xl border border-white/10 bg-white/5 p-3">Reaja com joinha, coração, fogo, ideia ou aplauso para participar da conversa.</p>
                 </div>
             </div>
         </aside>

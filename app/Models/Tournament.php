@@ -15,6 +15,8 @@ class Tournament extends Model
         'organizer_id',
         'title',
         'game',
+        'format',
+        'cancelled_at',
         'starts_at',
         'prize',
         'entry_fee',
@@ -28,6 +30,7 @@ class Tournament extends Model
     {
         return [
             'starts_at' => 'datetime',
+            'cancelled_at' => 'datetime',
             'entry_fee' => 'decimal:2',
             'highlighted' => 'boolean',
         ];

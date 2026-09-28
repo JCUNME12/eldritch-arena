@@ -13,17 +13,17 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
-        display: ['Orbitron', 'Inter', ...defaultTheme.fontFamily.sans]
+        display: ['Georgia', ...defaultTheme.fontFamily.serif]
       },
       colors: {
         arena: {
-          black: '#05030A',
-          panel: '#0D0718',
-          panel2: '#120A24',
-          purple: '#A855F7',
-          violet: '#7C3AED',
-          cyan: '#22D3EE',
-          gold: '#FBBF24'
+          black: '#10151c',
+          panel: '#191f28',
+          panel2: '#202735',
+          purple: '#b7a1d5',
+          violet: '#716082',
+          cyan: '#83bcb3',
+          gold: '#d7bc80'
         }
       },
       boxShadow: {
@@ -31,7 +31,7 @@ export default {
         cyan: '0 0 22px rgba(34, 211, 238, 0.25)'
       },
       backgroundImage: {
-        'arena-radial': 'radial-gradient(circle at top left, rgba(168,85,247,.28), transparent 32%), radial-gradient(circle at bottom right, rgba(34,211,238,.18), transparent 28%), linear-gradient(135deg, #05030A 0%, #0D0718 45%, #030712 100%)'
+        'arena-radial': 'radial-gradient(circle at top left, rgba(168,85,247,.28), transparent 32%), radial-gradient(circle at bottom right, rgba(34,211,238,.18), transparent 28%), linear-gradient(135deg, #10151c 0%, #191f28 45%, #030712 100%)'
       }
     }
   },

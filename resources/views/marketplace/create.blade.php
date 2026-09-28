@@ -86,7 +86,7 @@
             <div class="mt-5 rounded-3xl border border-arena-gold/30 bg-arena-gold/10 p-5">
                 <p class="text-sm font-bold uppercase tracking-wide text-arena-gold">Status atual</p>
                 <p class="mt-2 text-xl font-black text-white">{{ auth()->user()->isPremium() ? 'Premium ativo' : 'Plano gratuito' }}</p>
-                <p class="mt-2 text-sm text-slate-300">{{ auth()->user()->isPremium() ? 'Suas cartas serão destacadas automaticamente.' : 'Assine o plano premium simulado para destacar seus anúncios na apresentação.' }}</p>
+                <p class="mt-2 text-sm text-slate-300">{{ auth()->user()->isPremium() ? 'Suas cartas serão destacadas automaticamente.' : 'Ative o acesso antecipado Plus para destacar novos anúncios.' }}</p>
             </div>
 
             <a href="{{ route('premium') }}" class="arena-btn mt-5 w-full text-center">Ver planos premium</a>

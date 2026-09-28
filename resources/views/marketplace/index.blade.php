@@ -3,11 +3,12 @@
         <div>
             <p class="font-bold text-arena-cyan">Cartas e colecionáveis</p>
             <h1 class="arena-section-title">Marketplace</h1>
-            <p class="mt-2 max-w-2xl text-slate-400">Compre, venda e descubra cartas anunciadas por players e lojistas da comunidade Eldritch Arena.</p>
+            <p class="mt-2 max-w-2xl text-slate-400">Encontre cartas para sua coleção. Negocie diretamente com jogadores e lojas, sem checkout na plataforma.</p>
         </div>
         <a href="{{ route('marketplace.create') }}" class="arena-btn">Vender carta</a>
     </div>
 
+    <form method="GET" class="mt-5 flex flex-wrap gap-3"><label class="flex-1"><span class="sr-only">Buscar carta</span><input name="q" class="arena-input" value="{{ request('q') }}" placeholder="Qual carta falta no seu deck?" maxlength="100"></label><input type="hidden" name="game" value="{{ $selectedGame }}"><label><span class="sr-only">Ordenar</span><select name="sort" class="arena-input">@foreach([''=>'Destaques','recent'=>'Mais recentes','price_asc'=>'Menor preço','price_desc'=>'Maior preço'] as $v=>$label)<option value="{{ $v }}" @selected(request('sort','')===$v)>{{ $label }}</option>@endforeach</select></label><label class="self-center text-sm"><input type="checkbox" name="mine" value="1" @checked(request('mine'))> Meus anúncios</label><button class="arena-btn-secondary">Buscar</button></form>
     <div class="mt-5 flex flex-wrap gap-2">
         <a href="{{ route('marketplace') }}" class="{{ !$selectedGame ? 'arena-btn' : 'arena-btn-secondary' }}">Todos</a>
         @foreach($games as $game)
@@ -22,14 +23,14 @@
                     @if($card->image_url)
                         <img src="{{ $card->image_url }}" alt="{{ $card->name }}" class="h-full w-full object-cover">
                     @else
-                        <span class="text-6xl">🃏</span>
+                        <span class="font-display text-6xl text-arena-gold" aria-hidden="true">◇</span>
                     @endif
                 </div>
                 <div class="p-5">
                     <div class="flex items-center justify-between gap-2">
                         <p class="text-sm font-bold text-arena-cyan">{{ $card->game }}</p>
                         @if($card->highlighted)
-                            <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-2 py-1 text-xs font-bold text-arena-gold">Premium</span>
+                            <span class="rounded-full border border-arena-gold/40 bg-arena-gold/10 px-2 py-1 text-xs font-bold text-arena-gold">Plus</span>
                         @endif
                     </div>
                     <h2 class="mt-2 text-2xl font-black group-hover:text-arena-cyan">{{ $card->name }}</h2>
@@ -54,4 +55,4 @@
             </div>
         @endforelse
     </div>
-</x-layouts.app>
+<div class="mt-6">{{ $cards->links() }}</div></x-layouts.app>
