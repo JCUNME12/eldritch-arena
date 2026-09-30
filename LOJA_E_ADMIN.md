@@ -1,13 +1,13 @@
 # Loja, estoque e administração
 
-Implementação local de 28/09/2026. A AWS não foi alterada.
+Implementação local de 28/09/2026, publicada na AWS em 30/09/2026. Veja [DEPLOY_AWS.md](DEPLOY_AWS.md) para backup, migrations e verificação da publicação.
 
 ## Fluxos disponíveis
 
 - Minha loja (`/loja`): perfil público da loja, nome e e-mail de contato, cadastro e edição de cartas por SKU, edição, condição e raridade.
 - Estoque: saldo inicial, entradas/saídas com motivo, quantidade mínima, busca por nome/SKU, filtros de estoque baixo, sem estoque e arquivados. Custo unitário e preço de venda separados. Custo total usa quantidade atual × custo unitário atual; não é contabilidade, lucro nem fluxo de caixa.
 - Movimentações guardam responsável, data, motivo, saldo anterior e final. Não há exclusão de histórico pela interface. Correções exigem uma nova movimentação com motivo.
-- Publicar/pause um produto no marketplace. A publicação gera um único anúncio vinculado ao item. Alterações de descrição/preço da loja são refletidas nesse anúncio. O saldo zero retira o anúncio das listagens, dos destaques e do acesso de compradores. Reposição reativa a disponibilidade se o anúncio não foi pausado. Um produto arquivado tem anúncio pausado e só pode ser arquivado sem saldo.
+- Publicar/pausar um produto no marketplace. A publicação gera um único anúncio vinculado ao item. Alterações de descrição/preço da loja são refletidas nesse anúncio. O saldo zero retira o anúncio das listagens, dos destaques e do acesso de compradores. Reposição reativa a disponibilidade se o anúncio não foi pausado. Um produto arquivado tem anúncio pausado e só pode ser arquivado sem saldo.
 - Anúncios antigos/avulsos continuam funcionando; não são convertidos automaticamente em estoque, pois não existe quantidade conhecida para eles.
 - Administração (`/admin`): acesso restrito, visão de contas, lojas, anúncios disponíveis e torneios, busca de contas por nome/e-mail. Este primeiro painel é de consulta; não inclui moderação, exclusão de usuários, pagamentos ou concessão de privilégios pela web.
 
