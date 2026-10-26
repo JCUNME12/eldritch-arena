@@ -36,10 +36,30 @@ class StoreController extends Controller
             ->when(($filters['stock'] ?? '') === 'low', fn ($q) => $q->whereColumn('quantity', '<=', 'minimum_quantity'))
             ->when(($filters['stock'] ?? '') === 'zero', fn ($q) => $q->where('quantity', 0))
             ->orderBy('name')->paginate(15)->withQueryString();
-        $stats = $store->items()->where('archived', false)->selectRaw('COUNT(*) as products, COALESCE(SUM(quantity),0) as units, COALESCE(SUM(quantity * cost),0) as cost_value')->first();
+        $stats = $store->items()->where('archived', false)->selectRaw('COUNT(*) as products, COALESCE(SUM(quantity),0) as units, COALESCE(SUM(quantity * cost),0) as cost_value, COALESCE(SUM(quantity * price),0) as sale_value')->first();
         $low = $store->items()->where('archived', false)->whereColumn('quantity', '<=', 'minimum_quantity')->count();
 
         return view('store.index', compact('store', 'items', 'stats', 'low'));
+    }
+
+
+    public function report(Request $r)
+    {
+        $store = $this->store($r);
+        abort_unless($store, 404);
+        abort_unless($r->user()->isPremium(), 403, 'Exportação disponível no Plus.');
+
+        return response()->streamDownload(function () use ($store) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['SKU', 'Produto', 'Quantidade', 'Custo unitário BRL', 'Preço unitário BRL', 'Mínimo', 'Situação'], ';', '"', '');
+            foreach ($store->items()->orderBy('id')->cursor() as $item) {
+                // Prevent spreadsheet formulas in user-controlled names and SKUs.
+                $safe = fn ($value) => preg_match('/^\s*[=+@\-]/u', $value) ? "'".$value : $value;
+                fputcsv($out, [$safe($item->sku), $safe($item->name), $item->quantity, $item->cost, $item->price, $item->minimum_quantity, $item->archived ? 'Arquivado' : 'Ativo'], ';', '"', '');
+            }
+            fclose($out);
+        }, 'estoque-arena.csv', ['Content-Type' => 'text/csv; charset=UTF-8', 'Cache-Control' => 'no-store']);
     }
 
     public function saveStore(Request $r)

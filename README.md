@@ -15,12 +15,13 @@ O desenvolvimento atual está na branch `feature/arena-professional`. A publica�
 | Comunidade | Tópicos, comentários e reações; edição e exclusão autorizadas |
 | Mesa | Escolha de Magic ou Yu-Gi-Oh!, formatos, vida, marcadores, dano de comandante, dados, moeda e sorteios |
 | Archenemy | Regra Commander: 60 de vida do arqui-inimigo e 60 compartilhados pelos aliados; esquemas embaralhados, revelação e esquemas contínuos |
-| Minha loja | SKU, custo/preço, saldo, alertas, entradas/saídas com histórico, publicação e pausa |
+| Minha loja | SKU, custo/preço, saldo, alertas, entradas/saídas com histórico, publicação e pausa; projeção e CSV para Plus |
+| Mostra | Duas lojas demo, checkout Pix/cartão/boleto simulado, aprovação/recusa/estorno, assinatura Plus e relatório |
 | Administração | Consulta de contas e indicadores, com privilégio independente do perfil |
 
 ## Limites do produto
 
-Não há processamento de pagamentos, checkout, entrega, reserva de estoque ou baixa automática por venda. As negociações ocorrem fora da plataforma e o lojista registra as saídas. Valores previstos de inscrições não representam dinheiro recebido. Arena Plus não representa uma cobrança integrada.
+Não há processamento de pagamentos reais, entrega ou reserva de estoque. No marketplace real, as negociações ocorrem fora da plataforma e o lojista registra as saídas. A área `/mostra` possui checkout e baixa/estorno simulados, restritos às lojas fictícias, sem movimentar dinheiro. Valores previstos de inscrições não representam dinheiro recebido. Arena Plus não representa uma cobrança integrada.
 
 O painel administrativo é inicialmente de consulta. A mesa salva seu estado no navegador, sem sincronização entre aparelhos nem execução automática dos efeitos das cartas. Imagens de esquemas dependem de conexão externa. O service worker não armazena páginas autenticadas ou tokens; não há promessa de funcionamento integral offline.
 
@@ -71,12 +72,15 @@ PostgreSQL: configure o banco exclusivo de testes conforme [POSTGRESQL.md](POSTG
 
 Na validação de 30/09: 28 testes PHP / 230 asserções e 33 testes JavaScript passaram. A suíte PostgreSQL também passou na validação de 28/09. Em 30/09, o sandbox bloqueou os subprocessos do build; a publicação reutilizou os assets aprovados em 28/09, sem alterações posteriores em CSS/JS. Login, páginas autenticadas, estoque, esquemas, assets e HTTPS foram verificados na VPS.
 
+Na validação da mostra em 26/10: **38 testes PHP / 351 asserções**, tanto em SQLite quanto PostgreSQL, **33 testes JavaScript** e build Vite concluídos. Veja [o roteiro da mostra](MOSTRA_FACULDADE.md).
+
 ## Atualização de segurança
 
 O runtime local e a imagem de produção foram atualizados para PHP 8.4.27. O Windows usa o pacote revisado com Brotli 1.2.1. Consulte [o registro da correção](SEGURANCA_PHP_20261026.md) para versões, backups e validações.
 
 ## Documentação
 
+- [Mostra, pagamentos simulados e comparação de planos](MOSTRA_FACULDADE.md)
 - [Arquitetura e regras](DOCUMENTACAO_TECNICA.md)
 - [Loja, estoque e administração](LOJA_E_ADMIN.md)
 - [Publicação e operação na AWS](DEPLOY_AWS.md)

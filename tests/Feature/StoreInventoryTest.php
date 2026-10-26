@@ -175,4 +175,20 @@ class StoreInventoryTest extends TestCase
         $this->artisan('arena:admin', ['email' => $u->email, '--revoke' => true])->assertSuccessful();
         $this->assertFalse($u->fresh()->isAdmin());
     }
+
+    public function test_plus_inventory_report_is_gated_owned_and_escapes_formulas(): void
+    {
+        $owner = $this->owner();
+        $item = $this->item();
+        $this->get('/loja/relatorio-estoque')->assertForbidden();
+        $owner->update(['premium_active' => true]);
+        $item->update(['name' => '=1+1']);
+        $this->actingAs($owner->fresh())->get('/loja')->assertOk()->assertSee('Potencial do acervo')->assertSee('62,50');
+        $csv = $this->get('/loja/relatorio-estoque')->assertOk()->streamedContent();
+        $this->assertStringContainsString("'=1+1", $csv);
+        $other = $this->owner();
+        $other->update(['premium_active' => true]);
+        $csv = $this->actingAs($other->fresh())->get('/loja/relatorio-estoque')->assertOk()->streamedContent();
+        $this->assertStringNotContainsString('MTG-01', $csv);
+    }
 }

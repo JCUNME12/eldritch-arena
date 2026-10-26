@@ -9,6 +9,7 @@ use App\Http\Controllers\LifeCounterController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProfileTypeController;
+use App\Http\Controllers\ShowcaseController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TournamentController;
 use App\Http\Middleware\EnsureAdmin;
@@ -27,9 +28,20 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::prefix('mostra')->name('showcase.')->controller(ShowcaseController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/lojas/{store}', 'store')->name('store');
+        Route::get('/lojas/{store}/checkout', 'checkout')->name('checkout');
+        Route::post('/lojas/{store}/pagamentos', 'create')->middleware('throttle:30,1')->name('create');
+        Route::get('/lojas/{store}/relatorio', 'report')->name('report');
+        Route::get('/pagamentos/{payment}', 'payment')->name('payment');
+        Route::post('/pagamentos/{payment}/estado', 'transition')->middleware('throttle:60,1')->name('transition');
+    });
+
     Route::middleware(EnsureStoreAccess::class)->prefix('loja')->name('store.')->controller(StoreController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/perfil', 'saveStore')->name('profile');
+        Route::get('/relatorio-estoque', 'report')->name('report');
         Route::get('/produtos/novo', 'create')->name('create');
         Route::post('/produtos', 'saveItem')->name('save');
         Route::get('/produtos/{item}', 'show')->name('show');

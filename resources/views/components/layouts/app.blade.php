@@ -22,7 +22,7 @@
         {{ $slot ?? '' }}
         @yield('content')
     </main>
-    <footer class="mx-auto max-w-7xl px-6 py-8 text-xs text-slate-500">Eldritch Arena · Encontre sua mesa. <a class="ml-3 underline" href="{{ route('premium') }}">Arena Plus</a></footer>
+    <footer class="mx-auto max-w-7xl px-6 py-8 text-xs text-slate-500">Eldritch Arena · Encontre sua mesa. <a class="ml-3 underline" href="{{ route('premium') }}">Arena Plus</a>@auth <a class="ml-3 underline" href="{{ route('showcase.index') }}">Mostra · lojas demo</a> @endauth</footer>
     @auth
         <x-bottom-nav />
     @endauth

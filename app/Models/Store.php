@@ -8,6 +8,11 @@ class Store extends Model
 {
     protected $fillable = ['name', 'contact_email', 'description'];
 
+    protected function casts(): array
+    {
+        return ['is_demo' => 'boolean'];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

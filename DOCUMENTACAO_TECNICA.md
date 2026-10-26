@@ -1,6 +1,6 @@
 # Documentação técnica — Eldritch Arena
 
-Estado atualizado em 30/09/2026. Veja o [README](README.md) para instalação, funcionalidades e limitações.
+Estado atualizado em 26/10/2026. Veja o [README](README.md) para instalação, funcionalidades e limitações.
 
 ## Arquitetura
 
@@ -15,6 +15,7 @@ Aplicação Laravel 13 com páginas Blade, Tailwind CSS e interações Alpine.js
 | `CommunityController` | Tópicos, comentários e reações |
 | `StoreController` | Perfil da loja, produtos e operações de estoque |
 | `InventoryService` | Transações de saldo, histórico e sincronização da vitrine |
+| `ShowcaseController` / `DemoPaymentService` | Lojas demo, checkout simulado, estados de pagamento e assinatura |
 | `AdminController` | Consulta de contas e indicadores |
 | `EnsureStoreAccess` / `EnsureAdmin` | Controle de acesso às áreas restritas |
 | `resources/js/life-counter.js` | Formatos, equipes, marcadores, sorteios e desfazer |
@@ -49,4 +50,11 @@ Na VPS, Caddy termina HTTPS e encaminha ao Apache/PHP; o PostgreSQL tem volume p
 
 ## Verificação
 
-Testes PHP cobrem autorização, estoque, idempotência, validações, anúncios, administração e fluxos da plataforma. Testes JavaScript cobrem formatos, recuperação de mesas, equipes, dados e baralhos. Contagens e execução recente estão no README. Pagamentos, moderação administrativa ampla e sincronização de mesas não estão implementados.
+Testes PHP cobrem autorização, estoque, idempotência, validações, anúncios, administração e fluxos da plataforma. Testes JavaScript cobrem formatos, recuperação de mesas, equipes, dados e baralhos. Contagens e execução recente estão no README. Pagamentos reais, moderação administrativa ampla e sincronização de mesas não estão implementados.
+
+
+## Mostra e planos
+
+`stores.is_demo` e `demo_presenter_id` isolam os conjuntos fictícios. `demo_payments` registra propósito (venda/assinatura), estado, snapshots monetários em centavos, método, token único de envio e eventos. Aprovação e estorno usam transação, bloqueando primeiro a loja, depois o pagamento e o item; as movimentações usam `InventoryService`. Repetir o estado atual não duplica operações; estados terminais não reabrem pagamentos. Assinaturas demo modificam apenas o proprietário fictício da loja.
+
+O relatório de vendas exige Plus e autorização sobre a demo. A exportação real `/loja/relatorio-estoque` exige Plus e retorna somente o estoque do próprio usuário, protegendo nomes e SKUs contra fórmulas CSV. A interface distingue projeção do estoque de receita e margem simuladas. Consulte [MOSTRA_FACULDADE.md](MOSTRA_FACULDADE.md) para roteiro, limites e preparação.
