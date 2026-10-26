@@ -2,7 +2,7 @@
 
 Plataforma para comunidades de card games, com torneios, marketplace, comunidade, ferramentas de mesa e estoque para lojistas. Desenvolvida por **João Carlos Campos**, no contexto do TCC, com identidade visual própria e interface responsiva.
 
-## Estado atual — 30/09/2026
+## Estado atual — 26/10/2026
 
 A reformulação está publicada na AWS: https://18.224.27.22.sslip.io/.
 O desenvolvimento atual está na branch `feature/arena-professional`. A publicação é manual; enviar um commit ao GitHub não atualiza automaticamente a VPS ou seu banco.
@@ -26,7 +26,7 @@ O painel administrativo é inicialmente de consulta. A mesa salva seu estado no 
 
 ## Tecnologias e organização
 
-PHP 8.4.1+ (8.x), Laravel 13, PostgreSQL 18, Blade, Tailwind CSS, Alpine.js e Vite. Na AWS, PHP/Apache, PostgreSQL e Caddy rodam em contêineres Docker Compose na mesma EC2; o banco não usa RDS nesta implantação.
+PHP 8.4.27 (pacote Windows 8.4.27-1), Laravel 13, PostgreSQL 18, Blade, Tailwind CSS, Alpine.js e Vite. Na AWS, PHP/Apache, PostgreSQL e Caddy rodam em contêineres Docker Compose na mesma EC2; o banco não usa RDS nesta implantação.
 
 - `app/Http`: controllers e middleware de autenticação/permissões.
 - `app/Models` e `app/Services`: entidades e regras, incluindo movimentação de estoque.
@@ -70,6 +70,10 @@ php artisan view:cache
 PostgreSQL: configure o banco exclusivo de testes conforme [POSTGRESQL.md](POSTGRESQL.md) e execute `php vendor/bin/phpunit -c phpunit.pgsql.xml`. Nunca use o banco do site nos testes.
 
 Na validação de 30/09: 28 testes PHP / 230 asserções e 33 testes JavaScript passaram. A suíte PostgreSQL também passou na validação de 28/09. Em 30/09, o sandbox bloqueou os subprocessos do build; a publicação reutilizou os assets aprovados em 28/09, sem alterações posteriores em CSS/JS. Login, páginas autenticadas, estoque, esquemas, assets e HTTPS foram verificados na VPS.
+
+## Atualização de segurança
+
+O runtime local e a imagem de produção foram atualizados para PHP 8.4.27. O Windows usa o pacote revisado com Brotli 1.2.1. Consulte [o registro da correção](SEGURANCA_PHP_20261026.md) para versões, backups e validações.
 
 ## Documentação
 
