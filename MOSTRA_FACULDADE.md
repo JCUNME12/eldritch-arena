@@ -78,3 +78,8 @@ Pelo HTTPS público, foram verificados os logins e páginas existentes, compra P
 A conta genérica de lojista usada no teste remoto ainda não possui loja real, então `/loja` exibe o cadastro e o relatório retorna 404. A análise e o CSV de estoque real foram validados nos testes locais com lojas preparadas em SQLite e PostgreSQL, incluindo isolamento entre proprietários.
 
 Após publicar, restavam aproximadamente 356 MB livres no disco de 6,8 GB da VPS (95% ocupado). A ampliação do disco segue necessária para crescimento e futuras compilações maiores.
+
+
+## Demonstração adicional: jogador Premium
+
+A área [Meus decks — exemplo Premium](https://18.224.27.22.sslip.io/meus-decks/exemplo) mostra 24 partidas fictícias sem gravar dados nas contas. Compare decks, confrontos e evolução mensal; depois mostre a diferença entre histórico gratuito e análises Plus. O roteiro completo está em [JOGADOR_PREMIUM.md](JOGADOR_PREMIUM.md).

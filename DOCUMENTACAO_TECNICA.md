@@ -15,6 +15,7 @@ Aplicação Laravel 13 com páginas Blade, Tailwind CSS e interações Alpine.js
 | `CommunityController` | Tópicos, comentários e reações |
 | `StoreController` | Perfil da loja, produtos e operações de estoque |
 | `InventoryService` | Transações de saldo, histórico e sincronização da vitrine |
+| `PlayerDeckController` / `PlayerInsights` | Histórico privado e análises Premium de decks e confrontos |
 | `ShowcaseController` / `DemoPaymentService` | Lojas demo, checkout simulado, estados de pagamento e assinatura |
 | `AdminController` | Consulta de contas e indicadores |
 | `EnsureStoreAccess` / `EnsureAdmin` | Controle de acesso às áreas restritas |
@@ -58,3 +59,8 @@ Testes PHP cobrem autorização, estoque, idempotência, validações, anúncios
 `stores.is_demo` e `demo_presenter_id` isolam os conjuntos fictícios. `demo_payments` registra propósito (venda/assinatura), estado, snapshots monetários em centavos, método, token único de envio e eventos. Aprovação e estorno usam transação, bloqueando primeiro a loja, depois o pagamento e o item; as movimentações usam `InventoryService`. Repetir o estado atual não duplica operações; estados terminais não reabrem pagamentos. Assinaturas demo modificam apenas o proprietário fictício da loja.
 
 O relatório de vendas exige Plus e autorização sobre a demo. A exportação real `/loja/relatorio-estoque` exige Plus e retorna somente o estoque do próprio usuário, protegendo nomes e SKUs contra fórmulas CSV. A interface distingue projeção do estoque de receita e margem simuladas. Consulte [MOSTRA_FACULDADE.md](MOSTRA_FACULDADE.md) para roteiro, limites e preparação.
+
+
+## Histórico de jogadores
+
+As tabelas `player_decks` e `player_matches` preservam resultados privados e removíveis de forma reversível. A análise é restrita ao proprietário com Plus ativo e os recortes separam o número de jogadores. A prévia em `/meus-decks/exemplo` não persiste dados. Veja [JOGADOR_PREMIUM.md](JOGADOR_PREMIUM.md) para fórmulas, filtros, limitações e roteiro.

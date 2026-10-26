@@ -17,6 +17,7 @@ O desenvolvimento atual está na branch `feature/arena-professional`. A publica�
 | Archenemy | Regra Commander: 60 de vida do arqui-inimigo e 60 compartilhados pelos aliados; esquemas embaralhados, revelação e esquemas contínuos |
 | Minha loja | SKU, custo/preço, saldo, alertas, entradas/saídas com histórico, publicação e pausa; projeção e CSV para Plus |
 | Mostra | Duas lojas demo, checkout Pix/cartão/boleto simulado, aprovação/recusa/estorno, assinatura Plus e relatório |
+| Jogador | Decks e histórico privado gratuitos; análises por confronto, evolução e CSV no Plus |
 | Administração | Consulta de contas e indicadores, com privilégio independente do perfil |
 
 ## Limites do produto
@@ -74,12 +75,15 @@ Na validação de 30/09: 28 testes PHP / 230 asserções e 33 testes JavaScript 
 
 Na validação da mostra em 26/10: **38 testes PHP / 351 asserções**, tanto em SQLite quanto PostgreSQL, **33 testes JavaScript** e build Vite concluídos. Veja [o roteiro da mostra](MOSTRA_FACULDADE.md).
 
+Na extensão do jogador em 26/10: **45 testes PHP / 450 asserções** passaram em SQLite e PostgreSQL, além de build e compilação Blade. [Recursos e interpretação das estatísticas](JOGADOR_PREMIUM.md).
+
 ## Atualização de segurança
 
 O runtime local e a imagem de produção foram atualizados para PHP 8.4.27. O Windows usa o pacote revisado com Brotli 1.2.1. Consulte [o registro da correção](SEGURANCA_PHP_20261026.md) para versões, backups e validações.
 
 ## Documentação
 
+- [Jogador gratuito e Premium](JOGADOR_PREMIUM.md)
 - [Mostra, pagamentos simulados e comparação de planos](MOSTRA_FACULDADE.md)
 - [Arquitetura e regras](DOCUMENTACAO_TECNICA.md)
 - [Loja, estoque e administração](LOJA_E_ADMIN.md)

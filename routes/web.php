@@ -7,6 +7,7 @@ use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LifeCounterController;
 use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\PlayerDeckController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProfileTypeController;
 use App\Http\Controllers\ShowcaseController;
@@ -28,6 +29,25 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::prefix('meus-decks')->name('decks.')->controller(PlayerDeckController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/novo', 'create')->name('create');
+        Route::post('/', 'save')->name('save');
+        Route::get('/analises', 'insights')->name('insights');
+        Route::get('/exemplo', 'example')->name('example');
+        Route::get('/exportar', 'export')->name('export');
+        Route::get('/{deck}', 'show')->name('show');
+        Route::get('/{deck}/editar', 'edit')->name('edit');
+        Route::put('/{deck}', 'update')->name('update');
+        Route::patch('/{deck}/arquivo', 'archive')->name('archive');
+        Route::get('/{deck}/partidas/nova', 'newMatch')->name('match.create');
+        Route::post('/{deck}/partidas', 'saveMatch')->middleware('throttle:60,1')->name('match.save');
+        Route::get('/partidas/{match}/editar', 'editMatch')->name('match.edit');
+        Route::put('/partidas/{match}', 'updateMatch')->name('match.update');
+        Route::delete('/partidas/{match}', 'removeMatch')->name('match.remove');
+        Route::post('/partidas/{match}/restaurar', 'restoreMatch')->withTrashed()->name('match.restore');
+    });
+
     Route::prefix('mostra')->name('showcase.')->controller(ShowcaseController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/lojas/{store}', 'store')->name('store');

@@ -17,6 +17,7 @@
 </div>
 <a class="arena-btn" href="{{ route('life-counter') }}">Abrir mesa ↗</a>
 </section>
+<section class="arena-card p-6 mt-6 flex flex-wrap justify-between items-center gap-5"><div><p class="eyebrow">{{ auth()->user()->isPremium() ? 'JOGADOR PLUS' : 'MEUS DECKS' }}</p><h2 class="text-2xl font-bold">Cada partida conta uma história.</h2><p class="text-slate-400 mt-3">Registre resultados e anotações. No Plus, compare seus decks e acompanhe taxas de vitória por confronto.</p></div><a class="arena-btn" href="{{ route('decks.index') }}">Abrir meus decks</a></section>
 <section class="mt-10">
 <div class="flex justify-between gap-4 items-center">
 <h2 class="text-2xl font-bold">Minhas inscrições</h2>
