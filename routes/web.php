@@ -13,9 +13,18 @@ use App\Http\Controllers\ProfileTypeController;
 use App\Http\Controllers\ShowcaseController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TournamentController;
+use App\Http\Controllers\TournamentReportController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureStoreAccess;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/reports', [TournamentReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/exemplo', [TournamentReportController::class, 'example'])->name('reports.example');
+Route::get('/reports/{tournament}', [TournamentReportController::class, 'show'])->name('reports.show');
+Route::middleware('auth')->group(function () {
+    Route::get('/torneios/{tournament}/apuracao', [TournamentReportController::class, 'manage'])->name('reports.manage');
+    Route::post('/torneios/{tournament}/apuracao', [TournamentReportController::class, 'change'])->middleware('throttle:90,1')->name('reports.change');
+});
 
 Route::view('/', 'welcome')->name('home');
 Route::get('/contador-de-vida', LifeCounterController::class)->name('life-counter');

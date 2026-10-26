@@ -93,3 +93,8 @@ O runtime local e a imagem de produção foram atualizados para PHP 8.4.27. O Wi
 - [Esquemas de Archenemy e fontes](ESQUEMAS_ARCHENEMY.md)
 - [Histórico da reformulação](REFORMULACAO_ARENA.md)
 - [Atualização do Laravel](UPGRADE_LARAVEL_13.md)
+
+
+### Reports de torneios (local)
+
+Apuração manual 1×1 pelo organizador, classificação, participação de arquétipos e report público com correções auditadas. Explore `/reports/exemplo` ou leia [RELATORIOS_TORNEIOS.md](RELATORIOS_TORNEIOS.md). Atualização de 26/10/2026 mantida localmente; não implantada na VPS. Ligas e ranking de temporada ainda são próximos passos.

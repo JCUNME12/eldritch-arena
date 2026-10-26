@@ -1,4 +1,5 @@
 <x-layouts.app title="Torneios — Eldritch Arena">
+<a class="mb-4 inline-block text-emerald-300 underline" href="{{ route('reports.index') }}">Reports · resultados e decks dos eventos</a>
 <div class="flex flex-wrap justify-between gap-4 items-end">
 <div>
 <p class="eyebrow">ENCONTRE SUA PRÓXIMA MESA</p>

@@ -30,6 +30,11 @@ class Tournament extends Model
     {
         return [
             'starts_at' => 'datetime',
+            'results_started_at' => 'datetime',
+            'report_published_at' => 'datetime',
+            'results_state' => 'array',
+            'report_snapshot' => 'array',
+            'results_revision' => 'integer',
             'cancelled_at' => 'datetime',
             'entry_fee' => 'decimal:2',
             'highlighted' => 'boolean',

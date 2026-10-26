@@ -85,7 +85,7 @@ class TournamentController extends Controller
         $data = $this->data($request);
         DB::transaction(function () use ($tournament, $data) {
             $locked = Tournament::lockForUpdate()->findOrFail($tournament->id);
-            if ($locked->cancelled_at || $locked->starts_at->isPast()) {
+            if ($locked->results_started_at || $locked->cancelled_at || $locked->starts_at->isPast()) {
                 throw ValidationException::withMessages(['tournament' => 'Este torneio não está aberto para edição.']);
             }
             if ($data['slots'] < $locked->registrations()->count()) {
@@ -100,7 +100,13 @@ class TournamentController extends Controller
     public function cancel(Request $request, Tournament $tournament): RedirectResponse
     {
         abort_unless($request->user()->id === $tournament->organizer_id, 403);
-        DB::transaction(fn () => Tournament::lockForUpdate()->findOrFail($tournament->id)->update(['cancelled_at' => now()]));
+        DB::transaction(function () use ($tournament) {
+            $locked = Tournament::lockForUpdate()->findOrFail($tournament->id);
+            if ($locked->results_started_at) {
+                throw ValidationException::withMessages(['tournament' => 'A apuração já começou. Preserve o histórico; retire o report de publicação para corrigir resultados.']);
+            }
+            $locked->update(['cancelled_at' => now()]);
+        });
 
         return back()->with('status', 'Torneio cancelado. O histórico dos inscritos foi preservado.');
     }
@@ -109,7 +115,7 @@ class TournamentController extends Controller
     {
         DB::transaction(function () use ($request, $tournament) {
             $t = Tournament::lockForUpdate()->findOrFail($tournament->id);
-            if ($t->cancelled_at || $t->starts_at->isPast()) {
+            if ($t->results_started_at || $t->cancelled_at || $t->starts_at->isPast()) {
                 throw ValidationException::withMessages(['tournament' => 'As inscrições deste torneio estão encerradas.']);
             }
             if ($t->organizer_id === $request->user()->id) {
@@ -131,7 +137,7 @@ class TournamentController extends Controller
     {
         DB::transaction(function () use ($request, $tournament) {
             $t = Tournament::lockForUpdate()->findOrFail($tournament->id);
-            if ($t->starts_at->isPast() && ! $t->cancelled_at) {
+            if ($t->results_started_at || ($t->starts_at->isPast() && ! $t->cancelled_at)) {
                 throw ValidationException::withMessages(['tournament' => 'O torneio já começou. Procure o organizador.']);
             }
             $t->registrations()->where('user_id', $request->user()->id)->delete();

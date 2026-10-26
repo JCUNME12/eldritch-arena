@@ -1,4 +1,5 @@
 <x-layouts.app title="{{ $tournament->title }} — Eldritch Arena">
+    <div class="mb-4 flex flex-wrap gap-4">@if(auth()->id()===$tournament->organizer_id)<a class="text-emerald-300 underline" href="{{ route('reports.manage',$tournament) }}">Apurar resultados</a>@endif @if($tournament->report_published_at)<a class="text-emerald-300 underline" href="{{ route('reports.show',$tournament) }}">Ver report público</a>@endif</div>
 <a class="text-sm text-slate-400" href="{{ route('tournaments.index') }}">← Todos os torneios</a>
 <section class="arena-card mt-5 p-6 md:p-10">
 <p class="eyebrow">{{ $tournament->game }} · {{ $tournament->format ?: 'Formato a confirmar com o organizador' }}</p>
