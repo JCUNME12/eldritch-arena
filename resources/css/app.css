@@ -446,3 +446,29 @@
 .scheme-image { display:block; width:100%; max-width:400px; height:auto; border-radius:15px; margin-inline:auto; }
 .scheme-rules { line-height:1.65; }
 @media(max-width:700px) { .scheme-revealed { grid-template-columns:minmax(0,1fr); gap:20px; } .scheme-back { min-height:380px; } }
+
+/* Game selection is the entry screen; the active table starts only on demand. */
+.table-setup { max-width: 900px; margin: 2rem auto; }
+.table-setup-content { padding: clamp(1rem, 3vw, 2.5rem); }
+.game-choice { position: relative; overflow: hidden; text-align: left; padding: 1.5rem; border: 1px solid #ffffff26; border-radius: 1.25rem; transition: border-color .2s, transform .2s; }
+.game-choice:hover { transform: translateY(-3px); border-color: #d9bd78; }
+.game-choice:focus-visible, .dice-choice:focus-visible { outline: 3px solid #d9bd78; outline-offset: 4px; }
+.game-choice-magic { background: radial-gradient(ellipse at top right, #96401f66, transparent 75%), #19161b; }
+.game-choice-ygo { background: radial-gradient(ellipse at top right, #7047b577, transparent 75%), #161722; }
+.game-choice-art { display: flex; align-items: center; justify-content: center; height: 130px; margin-bottom: 1.5rem; }
+.game-card { display: grid; place-items: center; width: 75px; height: 105px; border: 2px solid currentColor; border-radius: 8px; color: #e8bb7f; font-size: 3rem; transform: rotate(-10deg); box-shadow: 12px 5px 0 #ffffff0b, 24px 10px 0 #ffffff06; }
+.game-choice-ygo .game-card { color: #c3b1f3; transform: rotate(10deg); }
+.dice-choice { display: grid; justify-items: center; gap: .7rem; padding: 1rem; background: #ffffff08; border: 1px solid #ffffff20; border-radius: .8rem; font-weight: 700; }
+.dice-choice:hover { background: #d9bd781a; border-color: #d9bd78; }
+.dice-symbol { display: grid; place-items: center; width: 48px; height: 48px; border: 2px solid #d9bd78; border-radius: 12px; color: #d9bd78; font-size: 1.25rem; }
+@media (prefers-reduced-motion: reduce) { .game-choice { transition: none; } }
+
+main:has(.game-table[data-modal-open="true"]) { z-index: 60; }
+@media (max-width: 640px) {
+    .table-setup { margin: .5rem auto; }
+    .table-setup-content { padding: .5rem; }
+    .game-choice { padding: 1rem; }
+    .game-choice-art { height: 90px; margin-bottom: 1rem; }
+    .game-card { width: 55px; height: 75px; font-size: 2rem; }
+    .dice-choice { padding: .65rem; gap: .4rem; }
+}

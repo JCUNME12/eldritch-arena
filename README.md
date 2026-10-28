@@ -98,3 +98,10 @@ O runtime local e a imagem de produção foram atualizados para PHP 8.4.27. O Wi
 ### Reports de torneios (local)
 
 Apuração manual 1×1 pelo organizador, classificação, participação de arquétipos e report público com correções auditadas. Explore `/reports/exemplo` ou leia [RELATORIOS_TORNEIOS.md](RELATORIOS_TORNEIOS.md). Atualização de 26/10/2026 mantida localmente; não implantada na VPS. Ligas e ranking de temporada ainda são próximos passos.
+
+
+### Entrada da mesa e sorteios — 28/10/2026
+
+`/contador-de-vida` começa na escolha visual entre Magic e Yu-Gi-Oh!, seguida do formato e participantes. A partida anterior não é restaurada do navegador nem do banco. Atualizar ou sair da página encerra a mesa atual; histórico e desfazer existem somente enquanto a página está aberta. A primeira mesa inicia diretamente; substituir uma mesa ativa ainda exige confirmação.
+
+Dados e moeda abrem uma janela com D4/D6/D8/D10/D12/D20, moeda, sorteio de jogador e dado planar nos formatos apropriados. Fecha por botão, Escape ou clique fora, com retorno de foco ao botão. Os cartões dos jogos usam decoração própria em CSS, sem artes oficiais externas. Atualização apenas local e GitHub.

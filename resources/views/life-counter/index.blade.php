@@ -1,5 +1,6 @@
 <x-layouts.app title="Mesa de jogo — Eldritch Arena">
-<div x-data="lifeCounter" class="game-table" @keydown.escape.window="settings=false;tools=false;historyOpen=false;active=null">
+<div x-data="lifeCounter" class="game-table" :data-modal-open="tools || (settings && hasStarted) || active!==null" @keydown.escape.window="if(tools) closeTools(); else if(settings) closeSettings(); historyOpen=false;active=null">
+ <div x-show="hasStarted" x-cloak :inert="settings || tools || active!==null">
  <header class="table-toolbar">
 <div>
 <p class="eyebrow">COMPANHEIRO DE MESA</p>
@@ -8,9 +9,9 @@
 </p>
 </div>
 <div class="flex flex-wrap gap-2">
-<button class="arena-btn-secondary" @click="openSettings()">Nova mesa</button>
+<button class="arena-btn-secondary" x-ref="newTableButton" @click="openSettings()">Nova mesa</button>
 <button class="arena-btn-secondary" @click="undo()" :disabled="!history.length">Desfazer</button>
-<button class="arena-btn-secondary" @click="tools=!tools">Dados e moeda</button>
+<button class="arena-btn-secondary" x-ref="toolsButton" @click="openTools()">Dados e moeda</button>
 <button class="arena-btn-secondary" @click="fullscreen()">Tela cheia</button>
 <a x-show="format==='archenemy'" class="arena-btn-secondary" href="#scheme-deck">Esquemas</a>
 </div>
@@ -19,8 +20,6 @@
  <p x-text="'Referência do formato: '+presets[format].description"></p>
  <p class="mt-2" x-show="initial!==presets[format].life" x-text="'Pontos iniciais personalizados nesta mesa: '+initial+(presets[format].leaderLife ? ' por aliado; arqui-inimigo: '+presets[format].leaderLife : '')"></p>
  </div>
- <p x-show="storageError" x-cloak class="p-3 text-amber-200">Não foi possível restaurar ou salvar a mesa neste navegador.</p>
- <p x-show="migrationNotice" x-cloak class="p-3 text-amber-200" x-text="migrationNotice"></p>
  <div class="players-grid" :class="'players-'+players.length">
  <template x-for="(player,index) in players" :key="player.id">
 <section class="player-zone" :style="{'--player-color':player.color,'--digits':Math.max(2,String(player.life).length)}" :class="{'player-rotated':player.rotated}">
@@ -62,7 +61,7 @@
  </div>
  <template x-if="format==='archenemy'"><div id="scheme-deck">@include('life-counter.schemes')</div></template>
  <footer class="table-footer">
-<span>Salvo neste navegador · funciona sem conexão após abrir a mesa</span>
+<span>Mesa desta sessão · ao sair ou atualizar, escolha um jogo novamente</span>
 <div class="flex gap-4">
 <button @click="historyOpen=!historyOpen">Histórico</button>
 <button @click="reset()" x-text="pendingReset ? 'Confirmar reinício' : 'Reiniciar pontos'">
@@ -78,34 +77,26 @@
 </p>
 </template>
 </section>
- <section x-show="tools" x-cloak class="arena-card p-5 mt-3">
-<div class="flex justify-between">
-<h2 class="font-bold">Sorteio da mesa</h2>
-<button @click="tools=false">Fechar</button>
-</div>
-<div class="flex flex-wrap gap-2 mt-4">
-<template x-for="n in [4,6,8,10,12,20]">
-<button class="arena-btn-secondary" @click="dice(n)" x-text="'D'+n">
-</button>
-</template>
-<button x-show="presets[format].planar" class="arena-btn-secondary" @click="planarDie()">Dado planar</button>
-<button class="arena-btn-secondary" @click="coin()">Moeda</button>
-<button class="arena-btn" @click="randomPlayer()">Sortear jogador</button>
-</div>
-<p class="text-3xl font-bold mt-4" aria-live="polite" x-text="result">
-</p>
-</section>
- <div x-show="settings" x-cloak class="table-overlay" @click.self="settings=false">
-<section role="dialog" aria-modal="true" aria-label="Nova mesa" class="table-dialog" @keydown.tab="trapFocus($event)" x-effect="if(settings) { const step=setupStep; $nextTick(() => $el.querySelector(step==='game' ? '[data-game-choice]' : 'select').focus()) }">
+ </div>
+ <div x-show="tools" x-cloak class="table-overlay" @click.self="closeTools()">
+ <section role="dialog" aria-modal="true" aria-labelledby="dice-title" class="table-dialog" @keydown.tab="trapFocus($event)" x-effect="if(tools) $nextTick(() => $refs.closeDice.focus())">
+ <div class="flex items-center justify-between gap-3"><div><p class="eyebrow">SORTEIO DA MESA</p><h2 id="dice-title" class="text-2xl font-bold">Escolha seu dado</h2></div><button x-ref="closeDice" class="arena-btn-secondary" @click="closeTools()">Fechar</button></div>
+ <p class="mt-3 text-slate-400">Toque em uma opção para rolar. Você pode repetir quantas vezes precisar.</p>
+ <div class="grid grid-cols-3 gap-3 my-5"><template x-for="n in [4,6,8,10,12,20]" :key="n"><button class="dice-choice" @click="dice(n)" :aria-label="'Rolar dado de '+n+' faces'"><span class="dice-symbol" aria-hidden="true" x-text="n"></span><span x-text="'D'+n"></span></button></template></div>
+ <div class="flex flex-wrap gap-2"><button x-show="presets[format].planar" class="arena-btn-secondary" @click="planarDie()">Dado planar</button><button class="arena-btn-secondary" @click="coin()">Moeda</button><button class="arena-btn-secondary" @click="randomPlayer()">Sortear jogador</button></div>
+ <div class="mt-5 rounded-xl border border-white/10 p-5 text-center" role="status" aria-live="polite" aria-atomic="true"><p class="text-xs uppercase tracking-widest text-slate-400">Resultado</p><p class="mt-2 text-2xl font-bold" x-text="result || 'Pronto para rolar'"></p></div>
+ </section></div>
+ <div x-show="settings" x-cloak :class="hasStarted ? 'table-overlay' : 'table-setup'" @click.self="if(hasStarted) closeSettings()">
+<section :role="hasStarted ? 'dialog' : 'region'" :aria-modal="hasStarted ? 'true' : null" aria-label="Nova mesa" :class="hasStarted ? 'table-dialog' : 'table-setup-content'" @keydown.tab="if(hasStarted) trapFocus($event)" x-effect="if(settings) { const step=setupStep; $nextTick(() => $el.querySelector(step==='game' ? '[data-game-choice]' : 'select').focus()) }">
 <h2 class="text-2xl font-bold">Prepare sua mesa</h2>
 <div x-show="setupStep==='game'">
 <p class="text-slate-400 mt-2">1 de 2 · Qual jogo vocês vão jogar?</p>
-<div class="grid gap-3 mt-5">
-<button data-game-choice class="arena-btn-secondary p-5 text-left" @click="chooseGame('magic')">Magic: The Gathering</button>
-<button class="arena-btn-secondary p-5 text-left" @click="chooseGame('ygo')">Yu-Gi-Oh!</button>
+<div class="grid grid-cols-2 gap-3 mt-6">
+<button data-game-choice class="game-choice game-choice-magic" @click="chooseGame('magic')"><span class="game-choice-art" aria-hidden="true"><span class="game-card">✦</span></span><span class="text-xs uppercase tracking-widest text-amber-200">MAGIC: THE GATHERING</span><strong class="block mt-2 text-2xl">Magic</strong><span class="block mt-3 text-sm text-slate-300">Commander, Standard e outros formatos</span><span class="block mt-6 font-semibold">Escolher Magic →</span></button>
+<button class="game-choice game-choice-ygo" @click="chooseGame('ygo')"><span class="game-choice-art" aria-hidden="true"><span class="game-card">◇</span></span><span class="text-xs uppercase tracking-widest text-violet-200">HORA DO DUELO</span><strong class="block mt-2 text-2xl">Yu-Gi-Oh!</strong><span class="block mt-3 text-sm text-slate-300">Duelo clássico e Speed Duel</span><span class="block mt-6 font-semibold">Escolher Yu-Gi-Oh! →</span></button>
 </div>
 <button class="mt-5 text-sm text-slate-400 underline" @click="chooseGame('custom')">Criar uma mesa personalizada</button>
-<div class="mt-6"><button class="arena-btn-secondary" @click="settings=false">Cancelar</button></div>
+<div class="mt-6" x-show="hasStarted"><button class="arena-btn-secondary" @click="closeSettings()">Manter partida atual</button></div>
 </div>
 <div x-show="setupStep==='format'">
 <p class="text-slate-400 mt-2" x-text="'2 de 2 · '+({magic:'Magic: The Gathering',ygo:'Yu-Gi-Oh!',custom:'Mesa personalizada'}[draftGame])"></p>
@@ -134,7 +125,7 @@
 <div class="flex gap-3 mt-6">
 <button class="arena-btn" @click="start()" x-text="pendingStart ? 'Confirmar nova partida' : 'Iniciar mesa'">
 </button>
-<button class="arena-btn-secondary" @click="settings=false">Voltar</button>
+<button class="arena-btn-secondary" @click="closeSettings()" x-text="hasStarted ? 'Manter partida atual' : 'Voltar aos jogos'">Voltar</button>
 </div>
 </div>
 </section>

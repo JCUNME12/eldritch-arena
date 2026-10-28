@@ -2,44 +2,6 @@ import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import counter, { newPlayers, presets } from "../resources/js/life-counter.js";
 let saved;
-test("old Commander Archenemy tables restore under the unified name", () => {
-    saved = JSON.stringify({
-        format: "archenemy_commander",
-        initial: 60,
-        players: newPlayers(4, 60),
-    });
-    const c = counter();
-    c.init();
-    assert.equal(c.format, "archenemy");
-    assert.equal(c.initial, 60);
-});
-test("old classic Archenemy sums allied remaining life without losing player counters", () => {
-    const players = newPlayers(4, 20);
-    players[0].life = 35;
-    players[1].life = 12;
-    players[2].poison = 4;
-    saved = JSON.stringify({ format: "archenemy", initial: 20, players });
-    const c = counter();
-    c.init();
-    assert.deepEqual(
-        c.players.map((p) => p.life),
-        [35, 52, 52, 52],
-    );
-    assert.equal(c.players[2].poison, 4);
-    c.change(1, -2);
-    const restored = counter();
-    restored.init();
-    assert.deepEqual(
-        restored.players.map((p) => p.life),
-        [35, 50, 50, 50],
-    );
-    restored.reset();
-    restored.reset();
-    assert.deepEqual(
-        restored.players.map((p) => p.life),
-        [60, 60, 60, 60],
-    );
-});
 test("game selection filters formats and resets incompatible defaults without changing the active table", () => {
     const c = table("commander");
     c.openSettings();
@@ -54,7 +16,7 @@ test("game selection filters formats and resets incompatible defaults without ch
     c.chooseGame("custom");
     assert.deepEqual(Object.keys(c.availablePresets()), ["custom"]);
 });
-test("reopening a saved Yu-Gi-Oh table preserves its chosen format and points", () => {
+test("editing the current Yu-Gi-Oh table preserves its chosen format and points", () => {
     const c = table("speed");
     c.openSettings();
     c.chooseGame("ygo");
@@ -77,26 +39,8 @@ function table(format) {
     c.draftFormat = format;
     c.choosePreset();
     c.start();
-    c.start();
     return c;
 }
-test("every preset starts, persists and resets without losing its format", () => {
-    for (const format of Object.keys(presets)) {
-        const c = table(format);
-        assert.equal(c.format, format);
-        c.change(0, -3);
-        const restored = counter();
-        restored.init();
-        assert.deepEqual(restored.players, c.players);
-        assert.equal(restored.format, format);
-        restored.reset();
-        restored.reset();
-        assert.equal(
-            restored.players[0].life,
-            presets[format].leaderLife || presets[format].life,
-        );
-    }
-});
 test("Two-Headed Giant shares life and poison but keeps energy individual, including undo", () => {
     const c = table("two_headed");
     c.change(1, -7);
@@ -189,26 +133,6 @@ beforeEach(() => {
         setItem: (_, v) => (saved = v),
     };
 });
-test("Commander defaults to four players with 40 life, and a fresh table is confirmed", () => {
-    const c = counter();
-    c.draftFormat = "commander";
-    c.choosePreset();
-    c.start();
-    assert.equal(c.players.length, 2);
-    c.start();
-    assert.equal(c.players.length, 4);
-    assert.equal(c.players[0].life, 40);
-});
-test("life can go negative, undo restores it, refresh restores saved state", () => {
-    const c = counter();
-    c.change(0, -25);
-    assert.equal(c.players[0].life, -5);
-    const restored = counter();
-    restored.init();
-    assert.equal(restored.players[0].life, -5);
-    c.undo();
-    assert.equal(c.players[0].life, 20);
-});
 test("commander damage is separate per source and partner and changes life exactly once", () => {
     const c = counter();
     c.format = "commander";
@@ -255,18 +179,6 @@ test("reset preserves names and rotation; undo restores full game", () => {
     c.undo();
     assert.equal(c.players[0].life, 17);
 });
-test("corrupt storage recovers and unavailable storage does not break controls", () => {
-    saved = "{broken";
-    const c = counter();
-    c.init();
-    assert.equal(c.players.length, 2);
-    globalThis.localStorage.setItem = () => {
-        throw Error("quota");
-    };
-    c.change(0, 1);
-    assert.equal(c.players[0].life, 21);
-    assert.equal(c.storageError, true);
-});
 test("dice remain in range", () => {
     const c = counter();
     for (const sides of [4, 6, 8, 10, 12, 20])
@@ -295,4 +207,50 @@ test("a new table clears a pending reset confirmation", () => {
     c.change(0, -2);
     c.reset();
     assert.equal(c.players[0].life, 18);
+});
+
+test("opening the page never restores an old table or reads browser storage", () => {
+    globalThis.localStorage.getItem = () => { throw Error("must not read old table"); };
+    const c = counter(); c.init();
+    assert.equal(c.hasStarted, false);
+    assert.equal(c.settings, true);
+    assert.equal(c.setupStep, "game");
+    c.chooseGame("ygo"); c.start();
+    assert.equal(c.hasStarted, true);
+    assert.equal(c.players[0].life, 8000);
+    c.change(0, -500);
+    const reopened = counter(); reopened.init();
+    assert.equal(reopened.hasStarted, false);
+    assert.equal(reopened.settings, true);
+    assert.equal(reopened.setupStep, "game");
+});
+test("all presets start immediately on an empty table and reset correctly", () => {
+    for (const format of Object.keys(presets)) {
+        const c = table(format);
+        assert.equal(c.hasStarted, true); assert.equal(c.settings, false);
+        assert.equal(c.format, format);
+        c.change(0, -3); c.reset(); c.reset();
+        assert.equal(c.players[0].life, presets[format].leaderLife || presets[format].life);
+    }
+});
+test("replacing an active table still needs confirmation and clears old tools", () => {
+    const c = table("standard"); c.change(0, -3); c.openSettings();
+    c.chooseGame("ygo"); c.start();
+    assert.equal(c.pendingStart, true); assert.equal(c.players[0].life, 17);
+    c.tools=true; c.historyOpen=true; c.start();
+    assert.equal(c.players[0].life, 8000); assert.equal(c.pendingStart, false);
+    assert.equal(c.tools, false); assert.equal(c.historyOpen, false);
+});
+test("dice dialog opens empty, rolls, closes and returns focus", () => {
+    const c = table("standard"); let focused=false;
+    c.$nextTick=fn=>fn(); c.$refs={toolsButton:{focus:()=>focused=true}};
+    c.result="old roll"; c.openTools();
+    assert.equal(c.tools,true); assert.equal(c.result,"");
+    c.roll=()=>5; c.dice(6); assert.equal(c.result,"D6: 6");
+    c.closeTools(); assert.equal(c.tools,false); assert.equal(focused,true);
+});
+test("life changes work without storage and undo stays available in the current session", () => {
+    globalThis.localStorage.setItem=()=>{throw Error("disabled");};
+    const c=table("standard"); c.change(0,-25);
+    assert.equal(c.players[0].life,-5); c.undo(); assert.equal(c.players[0].life,20);
 });

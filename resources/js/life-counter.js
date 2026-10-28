@@ -234,7 +234,6 @@ export const presets = {
             "Ajuste os pontos e a quantidade de jogadores conforme o acordo da mesa.",
     },
 };
-const key = "eldritch.table.v2";
 export const colors = [
     "#265754",
     "#513c69",
@@ -271,82 +270,34 @@ export default function lifeCounter() {
         step: 1,
         pendingStart: false,
         pendingReset: false,
-        settings: false,
+        hasStarted: false,
+        settings: true,
         tools: false,
         historyOpen: false,
         active: null,
         history: [],
         result: "",
         customAmount: 100,
-        storageError: false,
-        migrationNotice: "",
         init() {
-            try {
-                const s = JSON.parse(localStorage.getItem(key));
-                const oldClassic =
-                    s?.format === "archenemy" && s.rulesVersion !== 3;
-                if (s?.format === "archenemy_commander") s.format = "archenemy";
-                if (
-                    s &&
-                    Object.hasOwn(presets, s.format) &&
-                    Number.isInteger(s.initial) &&
-                    s.initial > 0 &&
-                    s.initial <= 99999 &&
-                    Array.isArray(s.players) &&
-                    s.players.length >= 1 &&
-                    s.players.length <= 6 &&
-                    this.validCount(s.format, s.players.length) &&
-                    s.players.every(
-                        (p, i) =>
-                            p.id === i &&
-                            typeof p.rotated === "boolean" &&
-                            typeof p.name === "string" &&
-                            p.name.length <= 30 &&
-                            Number.isInteger(p.life) &&
-                            Math.abs(p.life) <= 999999 &&
-                            colors.includes(p.color) &&
-                            ["poison", "energy", "experience"].every(
-                                (k) => Number.isInteger(p[k]) && p[k] >= 0,
-                            ) &&
-                            Array.isArray(p.commander) &&
-                            p.commander.length === s.players.length &&
-                            p.commander.every(
-                                (a) =>
-                                    Array.isArray(a) &&
-                                    a.length === 2 &&
-                                    a.every(
-                                        (n) => Number.isInteger(n) && n >= 0,
-                                    ),
-                            ),
-                    )
-                ) {
-                    if (oldClassic) {
-                        const teamLife = Math.max(
-                            -999999,
-                            Math.min(
-                                999999,
-                                s.players
-                                    .slice(1)
-                                    .reduce((total, p) => total + p.life, 0),
-                            ),
-                        );
-                        s.players.slice(1).forEach((p) => (p.life = teamLife));
-                        s.initial = 60;
-                        this.migrationNotice =
-                            "Mesa antiga adaptada: a vida restante dos aliados foi somada em um total compartilhado. A vida atual do arqui-inimigo foi preservada; ao reiniciar, ambos os lados começam com 60.";
-                    }
-                    this.format = s.format;
-                    this.initial = s.initial;
-                    this.players = s.players;
-                    this.step = presets[s.format].step;
-                    this.players.forEach((p) => {
-                        this.sync(p.id, "life");
-                        this.sync(p.id, "poison");
-                    });
-                }
-            } catch {
-                this.storageError = true;
+            // Every page visit begins with an explicit game choice.
+            this.hasStarted = false;
+            this.settings = true;
+        },
+        openTools() {
+            this.result = "";
+            this.tools = true;
+        },
+        closeTools() {
+            this.tools = false;
+            this.$nextTick(() => this.$refs.toolsButton.focus());
+        },
+        closeSettings() {
+            if (!this.hasStarted) {
+                this.setupStep = "game";
+                return;
             }
+            this.settings = false;
+            this.$nextTick(() => this.$refs.newTableButton.focus());
         },
         validCount(format, count) {
             const p = presets[format];
@@ -430,21 +381,6 @@ export default function lifeCounter() {
                 first.focus();
             }
         },
-        save() {
-            try {
-                localStorage.setItem(
-                    key,
-                    JSON.stringify({
-                        rulesVersion: 3,
-                        format: this.format,
-                        initial: this.initial,
-                        players: this.players,
-                    }),
-                );
-            } catch {
-                this.storageError = true;
-            }
-        },
         checkpoint(label) {
             this.history.unshift({
                 label,
@@ -464,7 +400,6 @@ export default function lifeCounter() {
             if (player[field] === value) return;
             this.checkpoint(`Personalizar ${player.name}`);
             player[field] = value;
-            this.save();
         },
         change(i, delta, field = "life") {
             delta = Number(delta);
@@ -484,7 +419,6 @@ export default function lifeCounter() {
                 Math.min(999999, p[field] + delta),
             );
             this.sync(i, field);
-            this.save();
         },
         damage(target, source, slot, delta) {
             if (
@@ -508,14 +442,12 @@ export default function lifeCounter() {
                 Math.min(999999, p.life - (after - before)),
             );
             this.sync(target, "life");
-            this.save();
         },
         undo() {
             const state = this.history.shift();
             if (state) {
                 this.players = state.players;
-                this.save();
-            }
+                }
         },
         openSettings() {
             this.draftFormat = this.format;
@@ -575,11 +507,14 @@ export default function lifeCounter() {
                 life > 99999
             )
                 return;
-            if (!this.pendingStart) {
+            if (this.hasStarted && !this.pendingStart) {
                 this.pendingStart = true;
                 return;
             }
-            this.migrationNotice = "";
+            this.hasStarted = true;
+            this.pendingStart = false;
+            this.tools = false;
+            this.historyOpen = false;
             this.format = this.draftFormat;
             this.initial = life;
             this.step = presets[this.format].step;
@@ -589,7 +524,6 @@ export default function lifeCounter() {
             this.result = "";
             this.settings = false;
             this.active = null;
-            this.save();
         },
         reset() {
             if (!this.pendingReset) {
@@ -604,7 +538,6 @@ export default function lifeCounter() {
                 color: p.color,
                 rotated: p.rotated,
             }));
-            this.save();
         },
         roll(sides) {
             const n = new Uint32Array(1);
