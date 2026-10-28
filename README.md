@@ -105,3 +105,6 @@ Apuração manual 1×1 pelo organizador, classificação, participação de arqu
 `/contador-de-vida` começa na escolha visual entre Magic e Yu-Gi-Oh!, seguida do formato e participantes. A partida anterior não é restaurada do navegador nem do banco. Atualizar ou sair da página encerra a mesa atual; histórico e desfazer existem somente enquanto a página está aberta. A primeira mesa inicia diretamente; substituir uma mesa ativa ainda exige confirmação.
 
 Dados e moeda abrem uma janela com D4/D6/D8/D10/D12/D20, moeda, sorteio de jogador e dado planar nos formatos apropriados. Fecha por botão, Escape ou clique fora, com retorno de foco ao botão. Os cartões dos jogos usam decoração própria em CSS, sem artes oficiais externas. Atualização apenas local e GitHub.
+
+
+Os cartões de seleção agora utilizam artes promocionais oficiais de Magic Foundations e Yu-Gi-Oh! Duel Links, servidas localmente. Fontes e créditos: [public/images/games/SOURCES.md](public/images/games/SOURCES.md).

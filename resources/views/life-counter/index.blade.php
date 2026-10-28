@@ -92,10 +92,11 @@
 <div x-show="setupStep==='game'">
 <p class="text-slate-400 mt-2">1 de 2 · Qual jogo vocês vão jogar?</p>
 <div class="grid grid-cols-2 gap-3 mt-6">
-<button data-game-choice class="game-choice game-choice-magic" @click="chooseGame('magic')"><span class="game-choice-art" aria-hidden="true"><span class="game-card">✦</span></span><span class="text-xs uppercase tracking-widest text-amber-200">MAGIC: THE GATHERING</span><strong class="block mt-2 text-2xl">Magic</strong><span class="block mt-3 text-sm text-slate-300">Commander, Standard e outros formatos</span><span class="block mt-6 font-semibold">Escolher Magic →</span></button>
-<button class="game-choice game-choice-ygo" @click="chooseGame('ygo')"><span class="game-choice-art" aria-hidden="true"><span class="game-card">◇</span></span><span class="text-xs uppercase tracking-widest text-violet-200">HORA DO DUELO</span><strong class="block mt-2 text-2xl">Yu-Gi-Oh!</strong><span class="block mt-3 text-sm text-slate-300">Duelo clássico e Speed Duel</span><span class="block mt-6 font-semibold">Escolher Yu-Gi-Oh! →</span></button>
+<button data-game-choice class="game-choice game-choice-magic" @click="chooseGame('magic')"><span class="text-xs uppercase tracking-widest text-amber-200">MAGIC: THE GATHERING</span><strong class="block mt-2 text-2xl">Magic</strong><span class="block mt-3 text-sm text-slate-300">Commander, Standard e outros formatos</span><span class="block mt-6 font-semibold">Escolher Magic →</span></button>
+<button class="game-choice game-choice-ygo" @click="chooseGame('ygo')"><span class="text-xs uppercase tracking-widest text-violet-200">HORA DO DUELO</span><strong class="block mt-2 text-2xl">Yu-Gi-Oh!</strong><span class="block mt-3 text-sm text-slate-300">Duelo clássico e Speed Duel</span><span class="block mt-6 font-semibold">Escolher Yu-Gi-Oh! →</span></button>
 </div>
 <button class="mt-5 text-sm text-slate-400 underline" @click="chooseGame('custom')">Criar uma mesa personalizada</button>
+<p class="mt-4 text-xs text-slate-500">Artes: <a class="underline" href="https://magic.wizards.com/en/products/foundations" target="_blank" rel="noopener noreferrer">Magic © Wizards of the Coast</a> · <a class="underline" href="https://www.konami.com/yugioh/duel_links/en/" target="_blank" rel="noopener noreferrer">Yu-Gi-Oh! © Studio Dice/SHUEISHA, TV TOKYO, KONAMI</a>. Projeto de fãs, sem afiliação.</p>
 <div class="mt-6" x-show="hasStarted"><button class="arena-btn-secondary" @click="closeSettings()">Manter partida atual</button></div>
 </div>
 <div x-show="setupStep==='format'">

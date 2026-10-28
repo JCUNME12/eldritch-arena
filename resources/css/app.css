@@ -472,3 +472,9 @@ main:has(.game-table[data-modal-open="true"]) { z-index: 60; }
     .game-card { width: 55px; height: 75px; font-size: 2rem; }
     .dice-choice { padding: .65rem; gap: .4rem; }
 }
+
+/* Official promotional art; provenance and credits in public/images/games/SOURCES.md. */
+.game-choice { display: flex; flex-direction: column; justify-content: flex-end; min-height: 410px; background-size: cover; background-repeat: no-repeat; text-shadow: 0 2px 8px #000; }
+.game-choice-magic { background-image: linear-gradient(to bottom, #080b1400 15%, #080b1440 38%, #080b14ed 69%, #080b14 100%), url('/images/games/magic-foundations.jpg'); background-position: 55% top; }
+.game-choice-ygo { background-image: linear-gradient(to bottom, #080b1400 15%, #080b1440 38%, #080b14ed 69%, #080b14 100%), url('/images/games/yugioh-duel-links.webp'); background-position: center top; }
+@media (max-width: 640px) { .game-choice { min-height: 340px; } }
