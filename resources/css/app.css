@@ -478,3 +478,7 @@ main:has(.game-table[data-modal-open="true"]) { z-index: 60; }
 .game-choice-magic { background-image: linear-gradient(to bottom, #080b1400 15%, #080b1440 38%, #080b14ed 69%, #080b14 100%), url('/images/games/magic-foundations.jpg'); background-position: 55% top; }
 .game-choice-ygo { background-image: linear-gradient(to bottom, #080b1400 15%, #080b1440 38%, #080b14ed 69%, #080b14 100%), url('/images/games/yugioh-duel-links.webp'); background-position: center top; }
 @media (max-width: 640px) { .game-choice { min-height: 340px; } }
+
+main:has(.scheme-companion[data-setup-open="true"]) { z-index: 60; }
+.scheme-docked { scroll-margin-top: 1rem; }
+.scheme-quick-actions { position: sticky; top: .5rem; z-index: 5; display: flex; flex-wrap: wrap; gap: .75rem; padding: .75rem; margin-bottom: .75rem; border: 1px solid #ffffff20; border-radius: 1rem; background: #111720f5; }

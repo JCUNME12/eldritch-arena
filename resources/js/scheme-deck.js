@@ -1,4 +1,3 @@
-const storageKey = "eldritch.schemes.v1";
 export function shuffle(ids, randomIndex = randomBelow) {
     const result = [...ids];
     for (let i = result.length - 1; i > 0; i--) {
@@ -21,8 +20,7 @@ export default function schemeDeck() {
         cards: {},
         loading: true,
         error: "",
-        storageError: "",
-        selected: "all",
+        selected: "",
         deckId: null,
         queue: [],
         current: null,
@@ -54,19 +52,6 @@ export default function schemeDeck() {
             this.cards = Object.fromEntries(
                 catalog.cards.map((card) => [card.id, card]),
             );
-            try {
-                const saved = JSON.parse(localStorage.getItem(storageKey));
-                if (saved && this.validState(saved)) {
-                    this.restore(saved);
-                    this.selected = this.deckId;
-                    this.setup = false;
-                } else if (saved)
-                    this.storageError =
-                        "O baralho salvo não pôde ser restaurado. Escolha uma coleção para começar novamente.";
-            } catch {
-                this.storageError =
-                    "Não foi possível ler o baralho salvo neste navegador.";
-            }
         },
         validState(state) {
             const deck = this.catalog.decks.find((d) => d.id === state.deckId);
@@ -104,13 +89,40 @@ export default function schemeDeck() {
             this.ongoing = [...state.ongoing];
             this.imageFailed = false;
         },
-        save() {
-            try {
-                localStorage.setItem(storageKey, JSON.stringify(this.state()));
-            } catch {
-                this.storageError =
-                    "Não foi possível salvar. Você pode continuar, mas a partida pode se perder ao fechar esta página.";
+        dock() {
+            if (!this.$nextTick) return;
+            this.$nextTick(() => {
+                const panel = this.$refs.schemePanel;
+                const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+                panel.scrollIntoView({ behavior: reduced ? "instant" : "smooth", block: "start" });
+                if (!reduced) panel.animate([
+                    { transform: "translateY(-90px)", opacity: 0 },
+                    { transform: "translateY(0)", opacity: 1 }
+                ], { duration: 550, easing: "cubic-bezier(.2,.8,.2,1)" });
+                this.$refs.advanceScheme.focus({ preventScroll: true });
+            });
+        },
+        closeSetup() {
+            this.pending = false;
+            this.setup = false;
+            this.$nextTick?.(() => this.$refs.changeDeck.focus({ preventScroll: true }));
+        },
+        trapSetupFocus(event) {
+            const controls = [...event.currentTarget.querySelectorAll("button,select,a[href]")]
+                .filter(el => !el.disabled && el.offsetParent !== null);
+            const first = controls[0], last = controls.at(-1);
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        },
+        advance() {
+            if (!this.current && !this.queue.length) return;
+            this.checkpoint();
+            if (this.current) {
+                if (this.cards[this.current].ongoing) this.ongoing.push(this.current);
+                else this.queue.push(this.current);
             }
+            this.current = this.queue.shift() || null;
+            this.imageFailed = false;
         },
         checkpoint() {
             this.history.unshift(this.state());
@@ -133,14 +145,13 @@ export default function schemeDeck() {
             this.setup = false;
             this.pending = false;
             this.imageFailed = false;
-            this.save();
+            this.dock();
         },
         reveal() {
             if (this.current || !this.queue.length) return;
             this.checkpoint();
             this.current = this.queue.shift();
             this.imageFailed = false;
-            this.save();
         },
         next() {
             if (!this.current) return;
@@ -150,21 +161,18 @@ export default function schemeDeck() {
             else this.queue.push(this.current);
             this.current = null;
             this.imageFailed = false;
-            this.save();
         },
         abandon(id) {
             if (!this.ongoing.includes(id)) return;
             this.checkpoint();
             this.ongoing = this.ongoing.filter((value) => value !== id);
             this.queue.push(id);
-            this.save();
         },
         undo() {
             const state = this.history.shift();
             if (state) {
                 this.restore(state);
-                this.save();
-            }
+                }
         },
         deckName() {
             return (
@@ -179,7 +187,7 @@ export default function schemeDeck() {
             );
         },
         openSetup() {
-            this.selected = this.deckId || "all";
+            this.selected = "";
             this.pending = false;
             this.setup = true;
         },

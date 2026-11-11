@@ -108,3 +108,8 @@ Dados e moeda abrem uma janela com D4/D6/D8/D10/D12/D20, moeda, sorteio de jogad
 
 
 Os cartões de seleção agora utilizam artes promocionais oficiais de Magic Foundations e Yu-Gi-Oh! Duel Links, servidas localmente. Fontes e créditos: [public/images/games/SOURCES.md](public/images/games/SOURCES.md).
+
+
+### Esquemas do Archenemy — seleção por sessão
+
+A escolha do baralho abre em popup sem opção pré-selecionada e sem restaurar dados do navegador, tanto na mesa quanto em `/esquemas`. Após confirmar, o painel aparece abaixo dos jogadores com deslocamento animado; a preferência por movimento reduzido é respeitada. “Próximo esquema” resolve a carta atual e revela a seguinte em uma ação reversível: contínuos ficam ativos e esquemas comuns vão ao fundo. Há atalhos para trocar o baralho no topo da mesa e no painel. Substituir um baralho em andamento exige confirmação. Fechar a seleção preserva o baralho atual; confirmar uma nova mesa Archenemy limpa o companheiro de esquemas. Não há persistência entre visitas.

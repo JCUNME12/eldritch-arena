@@ -1,17 +1,18 @@
-<section x-data="schemeDeck" class="arena-card p-5 md:p-8 mt-6" aria-label="Baralho de esquemas">
+<section x-data="schemeDeck" class="scheme-companion arena-card p-5 md:p-8 mt-6" :data-setup-open="setup" @open-scheme-setup.window="openSetup()" @keydown.escape.window="if(setup) closeSetup()" aria-label="Baralho de esquemas">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
         <div><p class="eyebrow">O PRÓXIMO PASSO DO ARQUI-INIMIGO</p><h2 class="text-2xl font-bold">Esquemas</h2></div>
-        <button x-show="deckId && !setup" class="arena-btn-secondary" @click="openSetup()">Trocar baralho</button>
+        <button x-ref="changeDeck" class="arena-btn-secondary" @click="openSetup()" x-text="deckId ? 'Trocar baralho' : 'Escolher baralho'"></button>
     </div>
-    <p x-show="loading" role="status">Carregando coleções…</p>
-    <div x-show="error" x-cloak role="alert"><p x-text="error"></p><button class="arena-btn-secondary mt-3" @click="error='';loading=true;init()">Tentar novamente</button></div>
-    <p x-show="storageError" x-cloak class="text-amber-200 mb-4" role="alert" x-text="storageError"></p>
-    <template x-if="catalog">
-    <div>
-        <div x-show="setup">
+    <p x-show="!deckId && !setup" class="text-slate-400">Nenhum baralho escolhido. Abra a seleção quando estiver pronto.</p>
+    <div x-show="setup" x-cloak class="table-overlay" @click.self="closeSetup()">
+      <section role="dialog" aria-modal="true" aria-label="Escolher baralho de esquemas" class="table-dialog" @keydown.tab="trapSetupFocus($event)" x-effect="if(setup) $nextTick(() => $refs.closeSchemeSetup.focus())">
+        <div class="flex items-center justify-between gap-3 mb-4"><h2 class="text-xl font-bold">Prepare seus esquemas</h2><button x-ref="closeSchemeSetup" class="arena-btn-secondary" @click="closeSetup()">Fechar</button></div>
+        <p x-show="loading" role="status">Carregando coleções…</p>
+        <div x-show="error" role="alert"><p x-text="error"></p><button class="arena-btn-secondary mt-3" @click="error='';loading=true;init()">Tentar novamente</button></div>
+        <template x-if="catalog"><div>
             <p class="text-slate-300">Escolha uma coleção, um baralho temático ou misture todos os esquemas.</p>
             <label class="arena-label block mt-5">Coleção ou baralho
-                <select class="arena-input mt-2" x-model="selected" @change="pending=false">
+                <select class="arena-input mt-2" x-model="selected" @change="pending=false"><option value="" disabled>Selecione os esquemas…</option>
                     <template x-for="deck in catalog.decks" :key="deck.id"><option :value="deck.id" :selected="deck.id===selected" x-text="deck.kind+' · '+deck.name"></option></template>
                 </select>
             </label>
@@ -19,11 +20,16 @@
             <p class="text-sm text-slate-400 mt-2">Baralhos antigos foram adaptados sem repetições, conforme a regra de Archenemy Commander. Esta ferramenta revela cartas; vocês resolvem seus efeitos.</p>
             <p x-show="pending" role="alert" class="text-amber-200 mt-4">Isso substituirá o baralho em andamento e seus esquemas ativos.</p>
             <div class="flex flex-wrap gap-3 mt-5">
-                <button class="arena-btn" @click="start()" x-text="pending ? 'Confirmar novo baralho' : 'Embaralhar e começar'"></button>
-                <button x-show="deckId" class="arena-btn-secondary" @click="setup=false;pending=false">Continuar baralho atual</button>
+                <button class="arena-btn" :disabled="!selected" @click="start()" x-text="pending ? 'Confirmar novo baralho' : 'Embaralhar e começar'"></button>
+                <button x-show="deckId" class="arena-btn-secondary" @click="closeSetup()">Continuar baralho atual</button>
             </div>
-        </div>
-        <div x-show="!setup">
+        </div></template>
+      </section>
+    </div>
+    <template x-if="catalog"><div>
+        <div x-ref="schemePanel" x-show="deckId && !setup" class="scheme-docked">
+            <div class="scheme-quick-actions"><button x-ref="advanceScheme" class="arena-btn" @click="advance()" :disabled="!current && !queue.length" x-text="current ? 'Próximo esquema' : 'Revelar esquema'"></button><button class="arena-btn-secondary" @click="openSetup()">Trocar baralho</button></div>
+            <p class="text-xs text-slate-400 mb-4">Avance após resolver o efeito. Esquemas contínuos ficam ativos; os demais voltam ao fundo do baralho.</p>
             <div class="flex flex-wrap justify-between gap-3 mb-5">
                 <div><h3 class="font-bold" x-text="deckName()"></h3><p class="text-sm text-slate-400"><span x-text="queue.length"></span> no baralho · <span x-text="ongoing.length"></span> contínuos ativos</p></div>
                 <button class="arena-btn-secondary" @click="undo()" :disabled="!history.length">Desfazer esquema</button>
@@ -61,7 +67,7 @@
                     </template>
                 </div>
             </section>
-            <p class="text-xs text-slate-400 mt-5">Baralho salvo neste navegador. Revelar não repete cartas ainda na fila. Esquemas resolvidos voltam ao fundo; contínuos só voltam quando abandonados. Desfazer está disponível nesta sessão.</p>
+            <p class="text-xs text-slate-400 mt-5">Baralho somente nesta sessão; uma nova mesa começa sem seleção. Revelar não repete cartas ainda na fila. Esquemas resolvidos voltam ao fundo; contínuos só voltam quando abandonados. Desfazer está disponível nesta sessão.</p>
         </div>
         <p class="text-xs text-slate-400 mt-6">Catálogo: <span x-text="catalog.updated"></span> · Dados e imagens: <a href="https://scryfall.com" target="_blank" rel="noopener noreferrer" class="underline">Scryfall</a> · Listas: <a href="https://mtgjson.com" target="_blank" rel="noopener noreferrer" class="underline">MTGJSON</a>. Magic: The Gathering e suas cartas são © Wizards of the Coast. Ferramenta de fãs, sem afiliação. Imagens precisam de conexão.</p>
     </div>

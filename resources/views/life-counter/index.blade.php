@@ -13,7 +13,7 @@
 <button class="arena-btn-secondary" @click="undo()" :disabled="!history.length">Desfazer</button>
 <button class="arena-btn-secondary" x-ref="toolsButton" @click="openTools()">Dados e moeda</button>
 <button class="arena-btn-secondary" @click="fullscreen()">Tela cheia</button>
-<a x-show="format==='archenemy'" class="arena-btn-secondary" href="#scheme-deck">Esquemas</a>
+<a x-show="format==='archenemy'" class="arena-btn-secondary" href="#scheme-deck">Ver esquemas</a><button x-show="format==='archenemy'" class="arena-btn-secondary" @click="$dispatch('open-scheme-setup')">Trocar baralho de esquemas</button>
 </div>
 </header>
  <div class="arena-card p-4 mb-4 text-sm text-slate-300" x-show="presets[format].description">
@@ -59,7 +59,7 @@
 </section>
 </template>
  </div>
- <template x-if="format==='archenemy'"><div id="scheme-deck">@include('life-counter.schemes')</div></template>
+ <template x-if="format==='archenemy'"><div id="scheme-deck"><template x-for="session in [tableSession]" :key="session">@include('life-counter.schemes')</template></div></template>
  <footer class="table-footer">
 <span>Mesa desta sessão · ao sair ou atualizar, escolha um jogo novamente</span>
 <div class="flex gap-4">

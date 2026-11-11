@@ -271,6 +271,7 @@ export default function lifeCounter() {
         pendingStart: false,
         pendingReset: false,
         hasStarted: false,
+        tableSession: 0,
         settings: true,
         tools: false,
         historyOpen: false,
@@ -511,6 +512,7 @@ export default function lifeCounter() {
                 this.pendingStart = true;
                 return;
             }
+            this.tableSession++;
             this.hasStarted = true;
             this.pendingStart = false;
             this.tools = false;

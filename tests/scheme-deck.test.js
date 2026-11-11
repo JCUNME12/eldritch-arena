@@ -19,6 +19,7 @@ beforeEach(() => {
 function ready() {
     const d = schemeDeck();
     d.loadCatalog(catalog);
+    d.selected = "all";
     d.start();
     return d;
 }
@@ -88,14 +89,6 @@ test("undo restores reveal, resolution and abandonment with no lost cards", () =
     d.undo();
     assert.deepEqual(d.state(), initial);
 });
-test("refresh keeps card face, full deck order and ongoing cards", () => {
-    const d = ready();
-    d.reveal();
-    const restored = schemeDeck();
-    restored.loadCatalog(catalog);
-    assert.deepEqual(restored.state(), d.state());
-    assert.equal(restored.setup, false);
-});
 test("changing a running deck requires confirmation and clears old ongoing cards", () => {
     const d = ready();
     d.reveal();
@@ -109,22 +102,6 @@ test("changing a running deck requires confirmation and clears old ongoing cards
     assert.equal(d.current, null);
     assert.equal(d.ongoing.length, 0);
     assert.ok(d.validState(d.state()));
-});
-test("tampered duplicate saved deck is rejected, storage failure does not stop play", () => {
-    const d = ready();
-    const state = d.state();
-    state.queue[0] = state.queue[1];
-    stored = JSON.stringify(state);
-    const restored = schemeDeck();
-    restored.loadCatalog(catalog);
-    assert.equal(restored.setup, true);
-    assert.ok(restored.storageError);
-    globalThis.localStorage.setItem = () => {
-        throw Error("quota");
-    };
-    d.reveal();
-    assert.ok(d.current);
-    assert.ok(d.storageError);
 });
 test("exhausted deck with all cards active cannot reveal until abandonment", () => {
     const d = ready();
@@ -157,4 +134,32 @@ test("catalog network failure is visible and retry can recover", async () => {
     } finally {
         globalThis.fetch = previous;
     }
+});
+
+test("a fresh companion ignores saved schemes and requires explicit selection", () => {
+    const previous=ready(); previous.reveal(); stored=JSON.stringify(previous.state());
+    globalThis.localStorage.getItem=()=>{throw Error("must not restore");};
+    const d=schemeDeck(); d.loadCatalog(catalog);
+    assert.equal(d.selected, ""); assert.equal(d.deckId,null); assert.equal(d.setup,true);
+    assert.equal(d.current,null); assert.deepEqual(d.queue,[]);
+    d.start(); assert.equal(d.deckId,null);
+    d.selected="all"; d.start(); assert.equal(d.setup,false); assert.equal(d.current,null);
+});
+test("quick next preserves ongoing schemes and undo restores the whole action", () => {
+    const d=ready(); const ongoing=d.queue.find(id=>d.cards[id].ongoing);
+    d.queue=[ongoing,...d.queue.filter(id=>id!==ongoing)]; d.advance();
+    const before=d.state(); d.advance();
+    assert.ok(d.ongoing.includes(ongoing)); assert.ok(!d.queue.includes(ongoing));
+    assert.ok(d.current); assert.ok(d.validState(d.state()));
+    d.undo(); assert.deepEqual(d.state(),before);
+});
+test("quick next recycles normal schemes and never duplicates cards", () => {
+    const d=ready(); const normal=d.queue.find(id=>!d.cards[id].ongoing);
+    d.queue=[normal,...d.queue.filter(id=>id!==normal)]; d.advance(); d.advance();
+    assert.equal(d.queue.at(-1),normal); assert.ok(d.validState(d.state()));
+});
+test("reopening selection does not preselect or destroy the current deck", () => {
+    const d=ready(); d.reveal(); const before=d.state();
+    d.openSetup(); assert.equal(d.selected, ""); assert.equal(d.setup,true);
+    d.closeSetup(); assert.equal(d.setup,false); assert.deepEqual(d.state(),before);
 });
