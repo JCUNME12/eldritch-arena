@@ -51,6 +51,9 @@ class ShowcaseController extends Controller
     public function payment(Request $r, DemoPayment $payment, DemoPaymentService $service)
     {
         $service->authorize($payment->store, $r->user());
+        if ($payment->cart_order_id) {
+            return redirect()->route('cart.order', $payment->cart_order_id);
+        }
 
         return view('showcase.payment', compact('payment'));
     }

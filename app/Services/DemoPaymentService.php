@@ -69,9 +69,12 @@ class DemoPaymentService
         });
     }
 
-    public function transition(DemoPayment $payment, User $actor, string $target): DemoPayment
+    public function transition(DemoPayment $payment, User $actor, string $target, bool $fromCart = false): DemoPayment
     {
         $this->authorize($payment->store, $actor);
+        if ($payment->cart_order_id && ! $fromCart) {
+            $this->fail('Atualize este pagamento pelo pedido completo do carrinho.');
+        }
 
         return DB::transaction(function () use ($payment, $actor, $target) {
             // All payment operations lock the store first, keeping stock and plan changes serial.

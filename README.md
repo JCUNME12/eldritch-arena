@@ -2,9 +2,11 @@
 
 Plataforma para comunidades de card games, com torneios, marketplace, comunidade, ferramentas de mesa e estoque para lojistas. Desenvolvida por **João Carlos Campos**, no contexto do TCC, com identidade visual própria e interface responsiva.
 
-## Estado atual — 26/10/2026
+## Estado atual — 11/11/2026
 
-A reformulação está publicada na AWS: https://18.224.27.22.sslip.io/.
+A apresentação atual roda localmente em http://127.0.0.1:8000/mostra. A VPS da AWS permanece desligada para economizar créditos.
+Execute `INICIAR_DEMO.cmd` para iniciar o ambiente. Consulte o [roteiro e validação do Demo Day](docs/DEMO-DAY.md).
+As lojas demo incluem carrinho com vários produtos, checkout Pix/cartão/boleto simulado, aprovação e estorno integral com controle de estoque. Não há cobrança ou entrega real.
 O desenvolvimento atual está na branch `feature/arena-professional`. A publicação é manual; enviar um commit ao GitHub não atualiza automaticamente a VPS ou seu banco.
 
 | Área | Disponível |

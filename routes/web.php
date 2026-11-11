@@ -22,6 +22,13 @@ Route::get('/reports', [TournamentReportController::class, 'index'])->name('repo
 Route::get('/reports/exemplo', [TournamentReportController::class, 'example'])->name('reports.example');
 Route::get('/reports/{tournament}', [TournamentReportController::class, 'show'])->name('reports.show');
 Route::middleware('auth')->group(function () {
+    Route::prefix('carrinho')->name('cart.')->controller(\App\Http\Controllers\DemoCartController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/itens/{item}', 'update')->name('update');
+        Route::post('/checkout', 'checkout')->middleware('throttle:30,1')->name('checkout');
+        Route::get('/pedidos/{order}', 'order')->name('order');
+        Route::post('/pedidos/{order}/estado', 'transition')->middleware('throttle:60,1')->name('transition');
+    });
     Route::get('/torneios/{tournament}/apuracao', [TournamentReportController::class, 'manage'])->name('reports.manage');
     Route::post('/torneios/{tournament}/apuracao', [TournamentReportController::class, 'change'])->middleware('throttle:90,1')->name('reports.change');
 });

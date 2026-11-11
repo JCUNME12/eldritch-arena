@@ -3,7 +3,9 @@
         <div>
             <p class="font-bold text-arena-cyan">Cartas e colecionáveis</p>
             <h1 class="arena-section-title">Marketplace</h1>
-            <p class="mt-2 max-w-2xl text-slate-400">Encontre cartas para sua coleção. Negocie diretamente com jogadores e lojas, sem checkout na plataforma.</p>
+            <p class="mt-2 max-w-2xl text-slate-400">Encontre cartas para sua coleção. Os anúncios comuns têm negociação direta. Experimente o carrinho e checkout simulado nas lojas de demonstração.</p>
+            <a class="arena-btn-secondary mt-3" href="{{ route('showcase.index') }}">Comprar nas lojas demo</a>
+            <a class="arena-btn-secondary mt-3" href="{{ route('cart.index') }}">Meu carrinho demo</a>
         </div>
         <a href="{{ route('marketplace.create') }}" class="arena-btn">Vender carta</a>
     </div>
