@@ -1,6 +1,12 @@
 # Demo Day — execução local
 
-Atualizado em 11/11/2026. A VPS permanece desligada.
+Atualizado em 11/11/2026. A VPS foi religada a pedido do autor; endereço público: https://18.220.12.11.sslip.io/.
+
+## Apresentação na AWS
+
+A publicação preserva as contas e o banco existentes da VPS. O login local de demonstração não é automaticamente copiado para a internet. As lojas demo e o catálogo público autenticado foram preparados para a conta do apresentador já cadastrada no servidor.
+
+Backup antes da atualização: `backups/20261111-demo-day/` no diretório da aplicação da VPS. A imagem anterior foi preservada como `eldritch-arena-app:pre-demo-day-20261111`. A publicação aplica migrations incrementais, sem substituir o banco pelo local. Ao parar e iniciar a instância novamente, conferir o IPv4 e ajustar `SITE_HOST`/`APP_URL` caso mudem.
 
 ## Abrir
 

@@ -4,7 +4,7 @@ Plataforma para comunidades de card games, com torneios, marketplace, comunidade
 
 ## Estado atual — 11/11/2026
 
-A apresentação atual roda localmente em http://127.0.0.1:8000/mostra. A VPS da AWS permanece desligada para economizar créditos.
+A apresentação local roda em http://127.0.0.1:8000/mostra. Em 11/11/2026, a VPS foi religada para a apresentação pública no novo endereço https://18.220.12.11.sslip.io/.
 Execute `INICIAR_DEMO.cmd` para iniciar o ambiente. Consulte o [roteiro e validação do Demo Day](docs/DEMO-DAY.md).
 As lojas demo incluem carrinho com vários produtos, checkout Pix/cartão/boleto simulado, aprovação e estorno integral com controle de estoque. Não há cobrança ou entrega real.
 O desenvolvimento atual está na branch `feature/arena-professional`. A publicação é manual; enviar um commit ao GitHub não atualiza automaticamente a VPS ou seu banco.
