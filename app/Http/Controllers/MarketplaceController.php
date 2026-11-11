@@ -26,6 +26,13 @@ class MarketplaceController extends Controller
             ->latest()->paginate(12)->withQueryString();
 
         return view('marketplace.index', [
+            'demoItems' => \App\Models\InventoryItem::with('store')->where('archived', false)->where('quantity', '>', 0)
+                ->whereHas('store', fn ($q) => $q->where('is_demo', true)->where(fn ($q) => $q->where('demo_presenter_id', $request->user()->id)->orWhere('user_id', $request->user()->id)))
+                ->when($game, fn ($q) => $q->where('game', $game))
+                ->when($filters['q'] ?? null, fn ($q, $v) => $q->whereLike('name', '%'.$v.'%'))
+                ->when(($filters['sort'] ?? '') === 'price_asc', fn ($q) => $q->orderBy('price'))
+                ->when(($filters['sort'] ?? '') === 'price_desc', fn ($q) => $q->orderByDesc('price'))
+                ->orderBy('name')->paginate(12, ['*'], 'demo_page')->withQueryString(),
             'cards' => $cards,
             'selectedGame' => $game,
             'games' => ['Magic', 'Pokémon', 'Yu-Gi-Oh'],

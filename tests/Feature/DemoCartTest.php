@@ -12,6 +12,17 @@ class DemoCartTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_expanded_catalog_is_repeatable_and_buy_buttons_are_scoped_to_presenter(): void
+    {
+        [$user, $item] = $this->prepare();
+        $this->artisan('arena:demo-catalog', ['presenter' => $user->email])->assertSuccessful();
+        $this->artisan('arena:demo-catalog', ['presenter' => $user->email])->assertSuccessful();
+        $this->assertDatabaseCount('inventory_items', 46);
+        $this->assertSame(12, $item->fresh()->quantity);
+        $this->get('/marketplace?q=Arcane')->assertOk()->assertSee('Comprar Arcane Signet')->assertSee('12,90');
+        $this->actingAs(User::factory()->create())->get('/marketplace?q=Arcane')->assertOk()->assertDontSee('Comprar Arcane Signet');
+    }
+
     private function prepare(): array
     {
         $user = User::factory()->create();

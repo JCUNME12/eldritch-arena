@@ -21,6 +21,6 @@
 <fieldset><legend class="font-bold mb-3">Método de pagamento simulado</legend><div class="flex flex-wrap gap-6">@foreach(['pix'=>'Pix','card'=>'Cartão','boleto'=>'Boleto'] as $value=>$label)<label><input type="radio" name="method" value="{{ $value }}" @checked($loop->first)> {{ $label }}</label>@endforeach</div></fieldset>
 <p class="text-sm text-slate-400">Não solicitamos dados bancários. As taxas ilustrativas são descontadas da loja, sem acréscimo ao total. Preços e disponibilidade serão conferidos ao finalizar.</p><button class="arena-btn">Finalizar pedido demonstrativo</button></form></section>
 @endif
-<a class="arena-btn-secondary mt-6" href="{{ route('showcase.index') }}">Continuar comprando</a>
+<a class="arena-btn-secondary mt-6" href="{{ route('marketplace') }}">Continuar comprando</a>
 <section class="mt-8"><h2 class="text-xl font-bold mb-4">Meus últimos pedidos</h2>@forelse($orders as $order)<a class="arena-card block p-4 mb-3" href="{{ route('cart.order',$order) }}">Pedido DEMO #{{ $order->id }} · {{ $order->created_at->format('d/m H:i') }}</a>@empty<p class="text-slate-400">Nenhum pedido finalizado ainda.</p>@endforelse</section>
 </x-layouts.app>

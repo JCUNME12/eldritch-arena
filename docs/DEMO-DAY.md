@@ -22,6 +22,8 @@ As credenciais de apresentação ficam somente em `.local/demo-day-access.txt`, 
 
 ## Carrinho
 
+O marketplace exibe ofertas demo com botão **Comprar**, busca e paginação. O catálogo expandido contém 23 cartas em cada uma das duas lojas (46 ofertas). Para acrescentar as 20 cartas extras por loja em outro ambiente, execute `php artisan arena:demo-catalog EMAIL_DO_APRESENTADOR` após `arena:showcase`. O comando é repetível e não redefine estoque ou preços existentes. Os valores e metadados são ilustrativos.
+
 Carrinho em sessão separado por usuário; até 30 produtos e 99 unidades por produto, limitado pelo estoque. Aceita produtos das lojas demo autorizadas. Anúncios comuns continuam com negociação direta.
 
 Preços, custos e taxas vêm do servidor e são preservados no pedido. Pendentes não reservam estoque. Aprovação e estorno de vários produtos são atômicos: se qualquer linha falhar, nenhuma é aplicada. Reenvios não duplicam o pedido nem a movimentação. Cada loja recebe suas linhas no painel e relatório existentes. Alterações de estado devem ocorrer no pedido completo, não em linhas isoladas.

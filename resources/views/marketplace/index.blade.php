@@ -18,6 +18,30 @@
         @endforeach
     </div>
 
+    @if($demoItems->total())
+    <section class="mt-8" aria-label="Cartas para comprar na demonstração">
+        <p class="eyebrow">COMPRA DEMONSTRATIVA</p>
+        <h2 class="text-2xl font-bold">Escolha sua carta</h2>
+        <p class="text-slate-400 mt-2">{{ $demoItems->total() }} ofertas com estoque. Clique em Comprar, confira o carrinho e finalize com Pix, cartão ou boleto simulado. Preços fictícios, sem cobrança ou entrega.</p>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-5">
+        @foreach($demoItems as $item)
+            <article class="arena-card p-5 flex flex-col gap-3">
+                <p class="eyebrow">{{ $item->game }} · {{ $item->store->name }}</p>
+                <h3 class="text-xl font-bold">{{ $item->name }}</h3>
+                <p class="text-sm text-slate-400">{{ $item->condition }} · {{ $item->quantity }} disponíveis</p>
+                <p class="text-3xl font-bold text-arena-gold">R$ {{ number_format($item->price,2,',','.') }}</p>
+                <form method="POST" action="{{ route('cart.update',$item) }}">@csrf
+                    <input type="hidden" name="quantity" value="1"><input type="hidden" name="add" value="1">
+                    <button class="arena-btn w-full" aria-label="Comprar {{ $item->name }} na {{ $item->store->name }}">Comprar</button>
+                </form>
+                <span class="text-xs text-slate-400">Adiciona ao carrinho · demonstração</span>
+            </article>
+        @endforeach
+        </div>
+        <div class="mt-5">{{ $demoItems->links() }}</div>
+    </section>
+    @endif
+    <h2 class="text-2xl font-bold mt-8">Anúncios com negociação direta</h2>
     <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         @forelse($cards as $card)
             <a href="{{ route('marketplace.show', $card) }}" class="arena-card group overflow-hidden transition hover:-translate-y-1 hover:border-arena-cyan/50">
